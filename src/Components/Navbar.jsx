@@ -1,19 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [hasShadow, setHasShadow] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 0) {
+        setHasShadow(true);
+      } else {
+        setHasShadow(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   return (
-    <nav className=" text-white px-4 py-2 z-10 fixed top-0 w-full">
+    <nav
+      className={`text-white px-4 py-2 z-10 fixed top-0 w-full transition-shadow duration-300 ${
+        hasShadow ? "shadow-lg bg-opacity-90" : ""
+      }`}
+      style={{
+        backgroundColor: hasShadow ? "rgba(0, 0, 0, 0.8)" : "transparent",
+      }}
+    >
       <div className="mx-auto flex items-center justify-between">
         {/* Logo */}
         <div className="text-2xl font-bold">
           <Link to="/">
-            <img
-              src="/Images/logo-1.png"
-              width={"220px"} 
-            />
+            <img src="/Images/logo-1.png" width={"220px"} />
           </Link>
         </div>
 
@@ -88,7 +109,6 @@ const Navbar = () => {
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-gradient-to-r from-zinc-900 to-transparent w-full m-0 rounded-lg z-50">
-          
           <Link to="/dashboard" className="block px-3 py-2 hover:bg-gray-700">
             Dashboard
           </Link>
@@ -98,7 +118,7 @@ const Navbar = () => {
           <Link to="/crypto" className="block px-3 py-2 hover:bg-gray-700">
             Crypto
           </Link>
-          
+
           <button className="block w-full text-left px-3 py-2 text-white rounded-md">
             Profile
           </button>
@@ -109,6 +129,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-
-// logo center for small screens and left for large screens
-// menu items hidden for small screens and right for large screens
