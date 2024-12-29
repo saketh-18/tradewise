@@ -1,0 +1,7 @@
+banner - 1 : navbar , tagline with navigation to registration
+banner - 2 : stocks table with a tagline
+banner - 3 : analysis of a stock showing different features
+banner - 4 : crypto currency market
+banner - 5 : footer
+
+//connect with traders

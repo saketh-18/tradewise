@@ -1,0 +1,63 @@
+.banner-1 {
+    background-image: url(Images/banner-1-bg-3.jpg);
+    background-size: cover;
+}
+
+.hero-line {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.banner-1-sub {
+    text-shadow: 4px 7px 39px rgba(0,0,0,0.48);
+}
+
+.banner-1-main {
+    text-shadow: 4px 7px 39px rgba(0,0,0,1);
+}
+
+.searchbar {
+    background: rgba(118, 118, 118, 0.2);
+}
+
+
+@keyframes fadeInUp {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animation-1 {
+    animation: fadeInUp 1.5s ease-out;
+  }
+
+
+
+
+  .technicalAnalysis {
+    height: 14rem;
+  }
+
+  
+ 
+  /* @media (min-width: 768px) {
+    .widget-container > * {
+      height: auto !important;
+      max-height: 100%; /* Prevent overflow }}
+      
+      /* Add to your global Tailwind CSS */
+.widget-container {
+  @apply relative bg-gray-900 text-white border border-gray-700 rounded-lg p-6;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.8), 0px -2px 4px rgba(255, 255, 255, 0.02);
+}
+
+.widget-container:hover {
+  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.9), 0px -2px 6px rgba(255, 255, 255, 0.04);
+  transform: translateY(-2px);
+  transition: all 0.3s ease-in-out;
+}
+
