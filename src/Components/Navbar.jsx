@@ -31,14 +31,14 @@ const Navbar = () => {
       }}
     >
       <div className="mx-auto flex items-center justify-between">
-        {/* Logo */}
+        {/* logo */}
         <div className="text-2xl font-bold">
           <Link to="/">
             <img src="/Images/logo-1.png" width={"220px"} />
           </Link>
         </div>
 
-        {/* Search Bar */}
+        {/* search */}
         <div className="hidden md:flex items-center space-x-4">
           <input
             type="text"
@@ -47,7 +47,7 @@ const Navbar = () => {
           />
         </div>
 
-        {/* Desktop Menu */}
+        {/* desktop menu */}
         <div className="hidden md:flex space-x-8 text-xl w-1/4 justify-between">
           <Link to="/dashboard" className="hover:text-primary">
             Dashboard
@@ -60,9 +60,9 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* User Profile */}
+        {/* User profile */}
         <div className="hidden md:block">
-          <button className="px-4 py-2 rounded-md hover:text-primary">
+          <Link to="/account" className="px-4 py-2 rounded-md hover:text-primary">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -77,10 +77,10 @@ const Navbar = () => {
                 d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
               />
             </svg>
-          </button>
+          </Link>
         </div>
 
-        {/* Mobile Menu Toggle */}
+        {/* menu toggle */}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="md:hidden focus:outline-none"
@@ -106,7 +106,7 @@ const Navbar = () => {
         </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* mobile meu */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-gradient-to-r from-zinc-900 to-transparent w-full m-0 rounded-lg z-50">
           <Link to="/dashboard" className="block px-3 py-2 hover:bg-gray-700">
@@ -118,10 +118,9 @@ const Navbar = () => {
           <Link to="/crypto" className="block px-3 py-2 hover:bg-gray-700">
             Crypto
           </Link>
-
-          <button className="block w-full text-left px-3 py-2 text-white rounded-md">
+          <Link to="/account" className="block w-full text-left px-3 py-2 text-white rounded-md">
             Profile
-          </button>
+          </Link>
         </div>
       )}
     </nav>

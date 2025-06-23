@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Menu, X, Home, Settings, User, LogOut } from "lucide-react";
 
 export default function Sidebar() {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const toggleSidebar = () => setIsOpen(!isOpen);
 
   const navItems = [
