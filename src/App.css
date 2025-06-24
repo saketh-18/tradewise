@@ -1,6 +1,9 @@
 .banner-1 {
-    background-image: url(Images/banner-1-bg-3.jpg);
-    background-size: cover;
+    background-image: url("/Images/banner.jpg");
+     background-size: cover;
+  background-position: center;
+  position: relative;
+  z-index: -10; /* lower than button's z-10 */
 }
 
 .hero-line {

@@ -55,8 +55,11 @@ const Navbar = () => {
           <Link to="/trade" className="hover:text-primary">
             Trade
           </Link>
-          <Link to="/crypto" className="hover:text-primary">
+          {/* <Link to="/crypto" className="hover:text-primary">
             Crypto
+          </Link> */}
+          <Link to="/login" className="hover:text-primary">
+            Login
           </Link>
         </div>
 
@@ -115,11 +118,14 @@ const Navbar = () => {
           <Link to="/trade" className="block px-3 py-2 hover:bg-gray-700">
             Trade
           </Link>
-          <Link to="/crypto" className="block px-3 py-2 hover:bg-gray-700">
+          {/* <Link to="/crypto" className="block px-3 py-2 hover:bg-gray-700">
             Crypto
-          </Link>
+          </Link> */}
           <Link to="/account" className="block w-full text-left px-3 py-2 text-white rounded-md">
             Profile
+          </Link>
+          <Link to="/login" className="block w-full text-left px-3 py-2 text-white rounded-md">
+            Login
           </Link>
         </div>
       )}

@@ -102,9 +102,9 @@ export default function TradePage() {
       <nav className="z-50 h-24">
         <Navbar />
       </nav>
-      <div className="grid grid-cols-[auto_1fr] gap-1 w-screen">
+      <div className="grid grid-cols-[auto_1fr] gap-1 w-full overflow-x-hidden">
         <div className="ml-2 my-4">
-          <Sidebar />
+          {/* <Sidebar /> */}
         </div>
 
         <div className="p-6 w-full">

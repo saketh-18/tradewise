@@ -1,117 +1,113 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../Components/Navbar";
 import Sidebar from "../Components/SideBar";
-import Example from "../Components/lineChar"; // chart placeholder or performance line
+import axios from "axios";
 
-export default function Portfolio() {
-  const [portfolio, setPortfolio] = useState({
-    assets: [],
-    totalInvested: 0,
-    currentValue: 0,
-    profitLoss: 0,
-  });
+export default function Dashboard() {
+  const [summary, setSummary] = useState([]);
+  const startingMargin = 1000000;
 
   useEffect(() => {
-    const fetchPortfolio = async () => {
+    const fetchSummary = async () => {
       try {
-        const res = await fetch("/api/portfolio", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+        const res = await axios.get("http://localhost:5000/api/trades/summary", {
+          withCredentials: true,
         });
-        const data = await res.json();
-        setPortfolio(data);
+        setSummary(res.data);
       } catch (err) {
-        console.error("Error fetching portfolio:", err);
+        console.error("Error fetching trade summary:", err);
       }
     };
-
-    fetchPortfolio();
+    fetchSummary();
   }, []);
 
+  const totalInvested = summary.reduce((sum, item) => sum + item.invested, 0);
+  const currentValue = summary.reduce((sum, item) => sum + item.currentValue, 0);
+  const totalPL = currentValue - totalInvested;
+  const availableMargin = startingMargin - totalInvested;
+
+  const topPerformers = [...summary].sort((a, b) => b.pl - a.pl).slice(0, 3);
+
   return (
-    <div className="min-h-screen bg-[#0f111a] text-white font-sans">
-      <nav className="z-50 h-24">
-        <Navbar />
-      </nav>
+    <div className="min-h-screen bg-[#0f111a] text-white">
+      <Navbar />
+      <div className="flex relative top-24">
+        {/* <Sidebar /> */}
 
-      <div className="grid grid-cols-[auto_1fr] gap-1 w-screen">
-        <div className="ml-2 my-4">
-          <Sidebar />
-        </div>
+        <div className="flex-1 p-6">
+          <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
 
-        <div className="">
-          {/* Portfolio Section */}
-          <section className="bg-[#1a1d2b] p-6 m-4 rounded-lg">
-            <h2 className="text-xl font-semibold mb-4">Your Portfolio</h2>
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="text-[#7f8fa6]">
-                  <th className="py-2">Asset</th>
-                  <th>Quantity</th>
-                  <th>Price</th>
-                  <th>Current Price</th>
-                  <th>P/L</th>
-                </tr>
-              </thead>
-              <tbody>
-                {portfolio.assets.map((asset, i) => (
-                  <tr key={i} className="border-t border-[#2b2f40]">
-                    <td className="py-2 font-medium">{asset.name}</td>
-                    <td>{asset.quantity}</td>
-                    <td>${asset.price.toFixed(2)}</td>
-                    <td>${asset.current.toFixed(2)}</td>
-                    <td
-                      className={
-                        asset.pl >= 0 ? "text-green-400" : "text-red-500"
-                      }
-                    >
-                      {asset.pl >= 0
-                        ? `+$${asset.pl.toFixed(2)}`
-                        : `-$${Math.abs(asset.pl).toFixed(2)}`}
-                    </td>
+          {/* Overview Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div className="bg-[#1a1d2b] p-4 rounded-lg shadow-md">
+              <p className="text-gray-400">Invested Margin</p>
+              <p className="text-2xl font-semibold text-white">₹{totalInvested.toFixed(2)}</p>
+            </div>
+            <div className="bg-[#1a1d2b] p-4 rounded-lg shadow-md">
+              <p className="text-gray-400">Available Margin</p>
+              <p className="text-2xl font-semibold text-white">₹{availableMargin.toFixed(2)}</p>
+            </div>
+            <div className="bg-[#1a1d2b] p-4 rounded-lg shadow-md">
+              <p className="text-gray-400">Total P&L</p>
+              <p className={`text-2xl font-semibold ${totalPL >= 0 ? "text-green-400" : "text-red-400"}`}>
+                ₹{totalPL.toFixed(2)}
+              </p>
+            </div>
+          </div>
+
+          {/* Top Performing Assets */}
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold mb-3">Top Performing Assets</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {topPerformers.map((item, index) => (
+                <div key={index} className="bg-[#1a1d2b] p-4 rounded-lg">
+                  <p className="text-lg font-semibold">{item.symbol}</p>
+                  <p className="text-sm text-gray-400">Quantity: {item.quantity}</p>
+                  <p className="text-sm">Avg Buy Price: ₹{item.avgBuyPrice.toFixed(2)}</p>
+                  <p className="text-sm">Current Price: ₹{item.currentPrice.toFixed(2)}</p>
+                  <p className={`text-sm ${item.pl >= 0 ? "text-green-400" : "text-red-400"}`}>
+                    P&L: ₹{item.pl.toFixed(2)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Asset Table */}
+          <div>
+            <h2 className="text-xl font-semibold mb-3">Portfolio Summary</h2>
+            <div className="bg-[#1a1d2b] p-4 rounded-lg overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="text-[#7f8fa6] text-left">
+                  <tr>
+                    <th>Symbol</th>
+                    <th>Quantity</th>
+                    <th>Avg Buy Price</th>
+                    <th>Current Price</th>
+                    <th>Invested</th>
+                    <th>Current Value</th>
+                    <th>P&L</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {summary.map((item, index) => (
+                    <tr key={index} className="border-t border-[#2b2f40]">
+                      <td>{item.symbol}</td>
+                      <td>{item.quantity}</td>
+                      <td>₹{item.avgBuyPrice.toFixed(2)}</td>
+                      <td>₹{item.currentPrice.toFixed(2)}</td>
+                      <td>₹{item.invested.toFixed(2)}</td>
+                      <td>₹{item.currentValue.toFixed(2)}</td>
+                      <td className={item.pl >= 0 ? "text-green-400" : "text-red-400"}>
+                        ₹{item.pl.toFixed(2)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
 
-            {/* Chart Placeholder */}
-            <div className="mt-8 h-32 bg-gradient-to-r from-cyan-400/10 to-cyan-500/30 rounded-lg">
-              <Example />
-              <div
-                className="h-full w-full bg-no-repeat bg-contain bg-bottom"
-                style={{ backgroundImage: 'url("/graph-placeholder.svg")' }}
-              ></div>
-            </div>
-          </section>
-
-          {/* Summary Cards */}
-          <section className="bg-[#1a1d2b] m-4 p-6 rounded-lg flex justify-between items-center text-sm">
-            <div>
-              <p className="text-[#7f8fa6]">Total Invested</p>
-              <p className="font-semibold text-lg">
-                ₹{portfolio.totalInvested.toLocaleString()}
-              </p>
-            </div>
-            <div>
-              <p className="text-[#7f8fa6]">Current Value</p>
-              <p className="font-semibold text-lg">
-                ₹{portfolio.currentValue.toLocaleString()}
-              </p>
-            </div>
-            <div>
-              <p className="text-[#7f8fa6]">Profit/Loss</p>
-              <p
-                className={`font-semibold text-lg ${
-                  portfolio.profitLoss >= 0 ? "text-green-400" : "text-red-500"
-                }`}
-              >
-                {portfolio.profitLoss >= 0
-                  ? `+₹${portfolio.profitLoss.toLocaleString()}`
-                  : `-₹${Math.abs(portfolio.profitLoss).toLocaleString()}`}
-              </p>
-            </div>
-          </section>
         </div>
       </div>
     </div>

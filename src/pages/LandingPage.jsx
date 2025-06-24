@@ -9,9 +9,15 @@ import TradingViewFinancialsWidget from "../Components/Widgets/FundamentalAnalys
 import SymbolOverview from "../Components/Widgets/SymbolOverview";
 import CryptoList from "../Components/Widgets/CryptoList";
 import Footer from "../Components/Footer";
+import { useNavigate } from "react-router-dom";
 
 
 export default function LandingPage() {
+  const navigate = useNavigate(); // hook for navigation
+
+  const handleGetStarted = () => {
+    navigate("/login"); // change this to "/register" if you meant that
+  };
   return (
     <>
       <Navbar />
@@ -19,16 +25,20 @@ export default function LandingPage() {
       <div className="flex h-screen w-full relative bg-fixed banner-1 -z-40">
         <div className="w-full z-9 bg-gradient-to-b from-zinc-900 to-transparent flex flex-col justify-center items-center">
           <p className="text-white banner-1-sub animation-1">
-            India's no1 paper trading platform.{" "}
+            India's no1 paper trading platform.
           </p>
           <p className="text-4xl sm:text-7xl text-white hero-line banner-1-main animation-1">
             Test before you Invest.
           </p>
-          <button className="bg-white rounded-lg py-2 px-5 mt-5 text-lg font-semibold animation-1">
+          <button
+            onClick={handleGetStarted}
+            className="bg-white hidden hover:bg-[#00ffb3] hover:text-black transition-all duration-300 ease-in-out transform hover:scale-105 rounded-lg py-2 px-5 mt-5 text-lg font-semibold"
+          >
             Get Started
           </button>
         </div>
       </div>
+
       {/* Banner 2 */}
       {/* <div className='flex relative h-screen bg-gradient-to-r from-gray-900 to-black '>
         <div className='w-full relative top-20 h-5/6 flex flex-col justify-center items-center'>

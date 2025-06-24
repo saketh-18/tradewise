@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../Components/Navbar";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -39,7 +40,7 @@ export default function Register() {
 };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0f111a] text-white">
+    <div className="min-h-screen flex items-center justify-center bg-[#0f111a] text-white"><Navbar />
       <form onSubmit={handleSubmit} className="bg-[#1a1d2b] p-8 rounded-lg shadow-md space-y-4 w-96">
         <h2 className="text-2xl font-bold">Register</h2>
         <input

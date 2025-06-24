@@ -45,12 +45,11 @@ router.post("/login", async (req, res) => {
     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "2h" });
     res.cookie("token", token, {
   httpOnly: true,
-  secure: false, // only over HTTPS
-  sameSite: "None", // or "Lax"
-  maxAge: 2 * 60 * 60 * 1000, // 2 hours
+  secure: false,
+  sameSite: "Lax", 
+  maxAge: 2 * 60 * 60 * 1000
 });
-    // res.json({ token });
-    res.status(200).json({ message: "Login successful" });
+res.json({ message: "Login successful" });
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ message: "Server error" });

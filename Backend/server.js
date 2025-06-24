@@ -9,6 +9,7 @@ import tradeRoutes from './routes/trades.js';
 import priceRoutes from './routes/price.js';
 import { authenticateToken } from './middleware/auth.js';
 import portfolioRoutes from './routes/portfolio.js';
+import profileRoute from './routes/profile.js';
 import cookieParser from 'cookie-parser';
 
 const app = express();
@@ -18,8 +19,9 @@ app.use(cors({
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 }));
-app.use(express.json());
 app.use(cookieParser());
+app.use(express.json());
+
 
 mongoose
   .connect(process.env.MONGO_URI)
@@ -31,19 +33,8 @@ app.use("/api", authRoutes);
 app.use("/api/trades", tradeRoutes);
 app.use("/api/price", priceRoutes);
 app.use("/api/portfolio", portfolioRoutes);
+app.use("/api/profile" , profileRoute);
 
-app.get("/profile" , authenticateToken ,async (req , res) => {
-  const {email} = req.query; 
-  try {
-    const profile = await User.findOne({email}); 
-    if(!profile) res.status(404).json({message : "user not found"});
-
-    res.json({username : profile.username , email : email, name : profile.name});
-  } catch(err) {
-    console.log("error while fetching profile" , err);
-    res.status(500).json({message : "server error"});
-  }
-})
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
