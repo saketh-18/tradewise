@@ -18,14 +18,14 @@ export default function Account() {
     const fetchData = async () => {
       try {
         const profileRes = await axios.get(
-          "http://localhost:5000/api/profile",
+          "https://tradewise-b8jz.onrender.com/api/profile",
           {
             params: { email: user.email },
           }
         );
         setUserInfo(profileRes.data);
 
-        const tradesRes = await axios.get("http://localhost:5000/api/trades", {
+        const tradesRes = await axios.get("https://tradewise-b8jz.onrender.com/api/trades", {
           headers: {
             "Content-Type": "application/json",
           },
@@ -34,7 +34,7 @@ export default function Account() {
         setTradeHistory(tradesRes.data);
 
         const summaryRes = await axios.get(
-          "http://localhost:5000/api/trades/summary",
+          "https://tradewise-b8jz.onrender.com/api/trades/summary",
           {
             headers: {
             "Content-Type": "application/json",

@@ -10,7 +10,7 @@ export default function Login() {
   const {setUser} = useAuth();
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch("http://localhost:5000/api/login", {
+    const res = await fetch("https://tradewise-b8jz.onrender.com/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",

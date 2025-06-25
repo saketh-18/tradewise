@@ -54,7 +54,7 @@ export default function TradePage() {
 
   try {
     // 🔽 Get live price
-    const priceRes = await fetch("http://localhost:5000/api/price/"+symbol);
+    const priceRes = await fetch("https://tradewise-b8jz.onrender.com/api/price/"+symbol);
     const priceData = await priceRes.json();
     const currentPrice = priceData.price;
     console.log(priceData);
@@ -73,7 +73,7 @@ export default function TradePage() {
     };
     
     console.log(token);
-    const res = await fetch("http://localhost:5000/api/trades", {
+    const res = await fetch("https://tradewise-b8jz.onrender.com/api/trades", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
