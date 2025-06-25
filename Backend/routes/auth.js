@@ -34,7 +34,7 @@ router.post("/register", async (req, res) => {
 
 // Login
 router.post("/login", async (req, res) => {
-  const { email , password } = req.body;
+  const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "Invalid credentials" });
@@ -43,17 +43,20 @@ router.post("/login", async (req, res) => {
     if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "2h" });
+
     res.cookie("token", token, {
-  httpOnly: true,
-  secure: false,
-  sameSite: "Lax", 
-  maxAge: 2 * 60 * 60 * 1000
-});
-res.json({ message: "Login successful" });
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      maxAge: 2 * 60 * 60 * 1000
+    });
+
+    res.json({ message: "Login successful" });
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ message: "Server error" });
   }
 });
+
 
 export default router;
