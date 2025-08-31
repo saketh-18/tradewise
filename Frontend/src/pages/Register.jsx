@@ -12,9 +12,10 @@ export default function Register() {
   const handleSubmit = async (e) => {
   e.preventDefault();
   try {
-    const res = await fetch("https://tradewise-b8jz.onrender.com/register", {
+    const res = await fetch("https://tradewise-b8jz.onrender.com/api/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ email, password , username , name }),
     });
 

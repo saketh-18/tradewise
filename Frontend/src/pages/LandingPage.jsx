@@ -16,14 +16,14 @@ export default function LandingPage() {
   const navigate = useNavigate(); // hook for navigation
 
   const handleGetStarted = () => {
-    navigate("/login"); // change this to "/register" if you meant that
+    navigate("/register");
   };
   return (
     <>
       <Navbar />
       {/* Banner 1*/}
-      <div className="flex h-screen w-full relative bg-fixed banner-1 -z-40">
-        <div className="w-full z-9 bg-gradient-to-b from-zinc-900 to-transparent flex flex-col justify-center items-center">
+      <div className="flex h-screen w-full relative bg-fixed banner-1 z-50">
+        <div className="w-full  bg-gradient-to-b from-zinc-900 to-transparent flex flex-col justify-center items-center">
           <p className="text-white banner-1-sub animation-1">
             India's no1 paper trading platform.
           </p>
@@ -32,7 +32,7 @@ export default function LandingPage() {
           </p>
           <button
             onClick={handleGetStarted}
-            className="bg-white hidden hover:bg-[#00ffb3] hover:text-black transition-all duration-300 ease-in-out transform hover:scale-105 rounded-lg py-2 px-5 mt-5 text-lg font-semibold"
+            className="bg-white relative   hover:bg-[#00ffb3] hover:text-black transition-all duration-300 ease-in-out transform hover:scale-105 rounded-lg py-2 px-5 mt-5 text-lg font-semibold"
           >
             Get Started
           </button>

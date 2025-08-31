@@ -48,7 +48,7 @@ const Navbar = () => {
         </div>
 
         {/* desktop menu */}
-        <div className="hidden md:flex space-x-8 text-xl w-1/4 justify-between">
+        <div className="hidden md:flex space-x-8 text-xl w-1/3 justify-between">
           <Link to="/dashboard" className="hover:text-primary">
             Dashboard
           </Link>
@@ -60,6 +60,10 @@ const Navbar = () => {
           </Link> */}
           <Link to="/login" className="hover:text-primary">
             Login
+          </Link>
+          {/* Register Route */}
+          <Link to="/register" className="hover:text-primary">
+            Register
           </Link>
         </div>
 

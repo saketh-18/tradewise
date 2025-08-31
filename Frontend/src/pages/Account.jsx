@@ -88,7 +88,7 @@ export default function Account() {
               {userInfo?.email || "Loading..."}
             </p>
             <p className="text-white text-md font-light">
-              {userInfo?.name || "Trader"}
+              {userInfo?.username || "Trader"}
             </p>
           </div>
         </div>
@@ -96,18 +96,18 @@ export default function Account() {
         <div className="md:col-span-2 bg-[#1a1d2b] p-4 rounded-lg flex items-center justify-evenly">
           <div className="flex flex-col text-center">
             <p className="text-neutral text-lg font-medium">Invested Margin</p>
-            <p className="text-white text-xl font-semibold">₹{investedMargin.toLocaleString()}</p>
+            <p className="text-white text-xl font-semibold">${investedMargin.toLocaleString()}</p>
           </div>
           <div className="flex flex-col text-center">
             <p className="text-neutral text-lg font-medium">Available Margin</p>
             <p className="text-white text-xl font-semibold">
-  ₹{(1000000 - investedMargin).toLocaleString()}
+  ${(1000000 - investedMargin).toLocaleString()}
 </p>
           </div>
           <div className="flex flex-col text-center">
             <p className="text-neutral text-lg font-medium">Unrealised P&L</p>
             <p className={`text-xl font-semibold ${unrealisedPL >= 0 ? "text-success" : "text-red-500"}`}>
-  ₹{unrealisedPL.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+  ${unrealisedPL.toLocaleString(undefined, { maximumFractionDigits: 2 })}
 </p>
           </div>
         </div>
