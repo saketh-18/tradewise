@@ -10,6 +10,7 @@ export default function Login() {
   const {setUser} = useAuth();
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("called login")
     const res = await fetch("https://tradewise-b8jz.onrender.com/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -19,7 +20,7 @@ export default function Login() {
 
     const data = await res.json();
     if (res.ok) {
-      localStorage.setItem("token", data.token);
+      // localStorage.setItem("token", data.token);
       console.log(data.token);
       setUser({username});
       navigate("/dashboard");

@@ -13,7 +13,7 @@ export default function Account() {
   const { user } = useAuth();
 
   useEffect(() => {
-    if (!user || !user.username) return;
+    if (!user || !user.username) setUserInfo(null);
 
     const fetchData = async () => {
       try {
@@ -85,10 +85,10 @@ export default function Account() {
           </svg>
           <div className="flex flex-col justify-center ml-4">
             <p className="text-white text-xl font-medium">
-              {userInfo?.name || "Loading..."}
+              {userInfo?.name || "Login to see"}
             </p>
             <p className="text-white text-md font-light">
-              {userInfo?.username || "Trader"}
+              {userInfo?.username || "Login to see"}
             </p>
           </div>
         </div>

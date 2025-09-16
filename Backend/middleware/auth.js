@@ -10,9 +10,11 @@ export const authenticateToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
+    // console.log("Decoded payload:", decoded); 
     req.user = decoded;
     next();
   } catch (err) {
+    // console.error("JWT verify failed:", err.message);
     res.status(401).json({ message: "Invalid token." });
   }
 };

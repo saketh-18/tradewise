@@ -1,17 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, {  useEffect, useState } from "react";
 import Navbar from "../Components/Navbar";
 import Sidebar from "../Components/SideBar";
 import axios from "axios";
 import AssetPieChart from "../Components/AssetPieChart";
 import RecentTrades from "../Components/RecentTrades";
+import { useAuth } from "../context/authContext";
 
 export default function Dashboard() {
   const [summary, setSummary] = useState([]);
   const startingMargin = 1000000;
-  const [summaryData, setSummaryData] = useState([]);
   const [recentTrades, setRecentTrades] = useState([]);
-
+  const {user} = useAuth();
   useEffect(() => {
+    if(!user) return;
     const fetchSummary = async () => {
       try {
         const res = await axios.get(
@@ -27,14 +28,6 @@ export default function Dashboard() {
     };
     fetchSummary();
     const fetchData = async () => {
-      const summaryRes = await axios.get(
-        "https://tradewise-b8jz.onrender.com/api/trades/summary",
-        {
-          withCredentials: true,
-        }
-      );
-      setSummaryData(await summaryRes.data);
-
       const tradeRes = await axios.get(
         "https://tradewise-b8jz.onrender.com/api/trades",
         {
@@ -43,7 +36,6 @@ export default function Dashboard() {
       );
       setRecentTrades(await tradeRes.data);
     };
-
     fetchData();
   }, []);
 
@@ -165,7 +157,7 @@ export default function Dashboard() {
               <h2 className="text-xl font-semibold mb-3 pb-16">Insights</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-[#1f2235] p-4 rounded-lg overflow-auto">
-                  <AssetPieChart data={summaryData} />
+                  <AssetPieChart data={summary} />
                 </div>
                 <div className="bg-[#1f2235] p-4 rounded-lg overflow-auto">
                   <RecentTrades trades={recentTrades} />

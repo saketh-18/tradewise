@@ -12,6 +12,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
 
 // Register
 router.post("/register", async (req, res) => {
@@ -35,6 +36,7 @@ router.post("/register", async (req, res) => {
 // Login
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
+  console.log(req.body);
   try {
     const user = await User.findOne({ username });
     if (!user) return res.status(400).json({ message: "Invalid credentials" });
@@ -46,8 +48,10 @@ router.post("/login", async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true,
-      sameSite: "None",
+      secure: true, // prod
+      // secure:false, //dev
+      sameSite: "None", // prod
+      // sameSite : "Lax", //dev
       path: "/",
       maxAge: 2 * 60 * 60 * 1000
     });
@@ -60,12 +64,23 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/logout", (req, res) => {
+  // console.log("---- LOGOUT REQUEST ----");
+  // console.log("Cookies received from client:", req.cookies);
+
   res.clearCookie("token", {
     httpOnly: true,
-    secure: true,
-    sameSite: "None",
-    path: "/"           // <-- must match login
+    secure: true, // prod
+    // secure: false,  // dev
+    sameSite: "None", // prod
+    // sameSite: "Lax", // dev
+    path: "/",       // must match login
+    maxAge: 2 * 60 * 60 * 1000  
   });
+
+  // console.log("Cleared token cookie");
+
+  // Check if cookie still exists in req after clearing
+  // console.log("Cookies after clearCookie call:", req.cookies);
 
   res.status(200).json({ message: "Logged out successfully" });
 });

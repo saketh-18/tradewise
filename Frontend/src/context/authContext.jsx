@@ -18,19 +18,19 @@ export const AuthProvider = ({ children }) => {
       alert(data.message || "login failed");
     }
   }
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
+  // useEffect(() => {
+  //   const storedUser = localStorage.getItem("user");
+  //   if (storedUser) {
+  //     setUser(JSON.parse(storedUser));
+  //   }
+  // }, []);
 
-  // Save to localStorage on change
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem("user", JSON.stringify(user));
-    }
-  }, [user]);
+  //  Save to localStorage on change
+  // useEffect(() => {
+  //   if (user) {
+  //     localStorage.setItem("user", JSON.stringify(user));
+  //   }
+  // }, [user]);
 
   return (
     <AuthContext.Provider value={{ user, setUser, logout}}>
