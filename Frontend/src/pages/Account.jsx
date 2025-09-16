@@ -13,14 +13,14 @@ export default function Account() {
   const { user } = useAuth();
 
   useEffect(() => {
-    if (!user || !user.email) return;
+    if (!user || !user.username) return;
 
     const fetchData = async () => {
       try {
         const profileRes = await axios.get(
           "https://tradewise-b8jz.onrender.com/api/profile",
           {
-            params: { email: user.email },
+            params: { username: user.username },
           }
         );
         setUserInfo(profileRes.data);
@@ -85,7 +85,7 @@ export default function Account() {
           </svg>
           <div className="flex flex-col justify-center ml-4">
             <p className="text-white text-xl font-medium">
-              {userInfo?.email || "Loading..."}
+              {userInfo?.name || "Loading..."}
             </p>
             <p className="text-white text-md font-light">
               {userInfo?.username || "Trader"}
