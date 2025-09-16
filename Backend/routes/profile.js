@@ -3,13 +3,13 @@ import User from "../models/User.js";
 
 const router = express.Router();
 
-// GET user profile by email
+// GET user profile by username
 router.get("/", async (req, res) => {
   try {
-    const { email } = req.query;
-    if (!email) return res.status(400).json({ message: "Email is required" });
+    const { username } = req.query;
+    if (!username) return res.status(400).json({ message: "username is required" });
 
-    const user = await User.findOne({ email }).select("email name username");
+    const user = await User.findOne({ username }).select("username name username");
     if (!user) return res.status(404).json({ message: "User not found" });
 
     res.json(user);
