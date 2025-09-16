@@ -159,6 +159,7 @@ export default function Dashboard() {
                   ))}
                 </tbody>
               </table>
+              </div>
             </div>
             <div className="mb-8 mt-4">
               <h2 className="text-xl font-semibold mb-3 pb-16">Insights</h2>
@@ -171,7 +172,7 @@ export default function Dashboard() {
                 </div>
               </div>
             </div>
-          </div>
+          
         </div>
     </div>
     </>

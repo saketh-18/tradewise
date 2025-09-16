@@ -5,6 +5,19 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null); // { email, name, username }
+  const logout = async () => {
+    setUser(null);
+    const res = await fetch("https://tradewise-b8jz.onrender.com/api/logout" , {
+      method : "POST",
+    })
+    
+    const data = await res.json();
+    if(res.ok){
+      console.log(data);
+    } else {
+      alert(data.message || "login failed");
+    }
+  }
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -20,7 +33,7 @@ export const AuthProvider = ({ children }) => {
   }, [user]);
 
   return (
-    <AuthContext.Provider value={{ user, setUser }}>
+    <AuthContext.Provider value={{ user, setUser, logout}}>
       {children}
     </AuthContext.Provider>
   );

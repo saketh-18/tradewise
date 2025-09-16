@@ -4,7 +4,7 @@ import { useAuth } from "../context/authContext";
 import Navbar from "../Components/Navbar";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
+  const [username, setName] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const {setUser} = useAuth();
@@ -14,14 +14,14 @@ export default function Login() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ username, password }),
     });
 
     const data = await res.json();
     if (res.ok) {
       localStorage.setItem("token", data.token);
       console.log(data.token);
-      setUser({email : email});
+      setUser({username});
       navigate("/dashboard");
     } else {
       alert(data.message || "Login failed");
@@ -33,16 +33,16 @@ export default function Login() {
       <form onSubmit={handleSubmit} className="bg-[#1a1d2b] p-8 rounded-lg shadow-md space-y-4 w-96">
         <h2 className="text-2xl font-bold">Login</h2>
         <input
-          type="email"
-          placeholder="Email"
+          type="text"
+          placeholder="Enter Username"
           className="w-full px-4 py-2 bg-[#2b2f40] rounded"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={username}
+          onChange={(e) => setName(e.target.value)}
           required
         />
         <input
           type="password"
-          placeholder="Password"
+          placeholder="Enter Password"
           className="w-full px-4 py-2 bg-[#2b2f40] rounded"
           value={password}
           onChange={(e) => setPassword(e.target.value)}

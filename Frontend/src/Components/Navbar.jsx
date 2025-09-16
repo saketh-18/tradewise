@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useContext } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/authContext";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [hasShadow, setHasShadow] = useState(false);
+  const { user , logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -58,18 +61,32 @@ const Navbar = () => {
           {/* <Link to="/crypto" className="hover:text-primary">
             Crypto
           </Link> */}
-          <Link to="/login" className="hover:text-primary">
-            Login
-          </Link>
-          {/* Register Route */}
-          <Link to="/register" className="hover:text-primary">
-            Register
-          </Link>
+          {user === null ? (
+            <>
+              <Link to="/login" className="hover:text-primary">
+                Login
+              </Link>
+              {/* Register Route */}
+              <Link to="/register" className="hover:text-primary">
+                Register
+              </Link>{" "}
+            </>
+          ) : (
+            <div className="flex gap-16">
+              <p>Hello {user.username}</p>
+              <button className="hover:text-primary"
+              onClick={logout}
+              >Logout</button>
+            </div>
+          )}
         </div>
 
         {/* User profile */}
         <div className="hidden md:block">
-          <Link to="/account" className="px-4 py-2 rounded-md hover:text-primary">
+          <Link
+            to="/account"
+            className="px-4 py-2 rounded-md hover:text-primary"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -125,10 +142,16 @@ const Navbar = () => {
           {/* <Link to="/crypto" className="block px-3 py-2 hover:bg-gray-700">
             Crypto
           </Link> */}
-          <Link to="/account" className="block w-full text-left px-3 py-2 text-white rounded-md">
+          <Link
+            to="/account"
+            className="block w-full text-left px-3 py-2 text-white rounded-md"
+          >
             Profile
           </Link>
-          <Link to="/login" className="block w-full text-left px-3 py-2 text-white rounded-md">
+          <Link
+            to="/login"
+            className="block w-full text-left px-3 py-2 text-white rounded-md"
+          >
             Login
           </Link>
         </div>
