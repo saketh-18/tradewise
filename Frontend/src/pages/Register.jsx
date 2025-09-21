@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../Components/Navbar";
+import { API_URL } from "../config";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -12,7 +13,7 @@ export default function Register() {
   const handleSubmit = async (e) => {
   e.preventDefault();
   try {
-    const res = await fetch("https://tradewise-b8jz.onrender.com/api/register", {
+    const res = await fetch(`${API_URL}/api/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",

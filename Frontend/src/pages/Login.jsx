@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/authContext";
 import Navbar from "../Components/Navbar";
+import { API_URL } from "../config";
 
 export default function Login() {
   const [username, setName] = useState("");
@@ -11,7 +12,7 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("called login")
-    const res = await fetch("https://tradewise-b8jz.onrender.com/api/login", {
+    const res = await fetch(`${API_URL}/api/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",

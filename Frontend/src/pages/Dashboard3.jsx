@@ -5,6 +5,8 @@ import axios from "axios";
 import AssetPieChart from "../Components/AssetPieChart";
 import RecentTrades from "../Components/RecentTrades";
 import { useAuth } from "../context/authContext";
+import { Import } from "lucide-react";
+import { API_URL } from "../config";
 
 export default function Dashboard() {
   const [summary, setSummary] = useState([]);
@@ -16,7 +18,7 @@ export default function Dashboard() {
     const fetchSummary = async () => {
       try {
         const res = await axios.get(
-          "https://tradewise-b8jz.onrender.com/api/trades/summary",
+          `${API_URL}/api/trades/summary`,
           {
             withCredentials: true,
           }
@@ -29,7 +31,7 @@ export default function Dashboard() {
     fetchSummary();
     const fetchData = async () => {
       const tradeRes = await axios.get(
-        "https://tradewise-b8jz.onrender.com/api/trades",
+        `${API_URL}/api/trades`,
         {
           withCredentials: true,
         }
@@ -160,7 +162,7 @@ export default function Dashboard() {
                   <AssetPieChart data={summary} />
                 </div>
                 <div className="bg-[#1f2235] p-4 rounded-lg overflow-auto">
-                  <RecentTrades trades={recentTrades} />
+                 <RecentTrades trades={recentTrades} />
                 </div>
               </div>
             </div>

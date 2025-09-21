@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../Components/Navbar";
 import Sidebar from "../Components/SideBar";
 import Watchlist from "../Components/Watchlist";
+import { API_URL } from "../config";
 
 export default function TradePage() {
   const [symbol, setSymbol] = useState("AAPL");
@@ -54,7 +55,7 @@ export default function TradePage() {
 
   try {
     // 🔽 Get live price
-    const priceRes = await fetch("https://tradewise-b8jz.onrender.com/api/price/"+symbol);
+    const priceRes = await fetch(`{API_URL}/api/price/`+symbol);
     const priceData = await priceRes.json();
     const currentPrice = priceData.price;
     console.log(priceData);
@@ -73,7 +74,7 @@ export default function TradePage() {
     };
     
     console.log(token);
-    const res = await fetch("https://tradewise-b8jz.onrender.com/api/trades", {
+    const res = await fetch(`${API_URL}/api/trades`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

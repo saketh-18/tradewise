@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../Components/Navbar";
 import axios from "axios";
 import { useAuth } from "../context/authContext";
+import { API_URL } from "../config";
 
 export default function Account() {
   const [userInfo, setUserInfo] = useState({});
@@ -18,14 +19,14 @@ export default function Account() {
     const fetchData = async () => {
       try {
         const profileRes = await axios.get(
-          "https://tradewise-b8jz.onrender.com/api/profile",
+          `${API_URL}/api/profile`,
           {
             params: { username: user.username },
           }
         );
         setUserInfo(profileRes.data);
 
-        const tradesRes = await axios.get("https://tradewise-b8jz.onrender.com/api/trades", {
+        const tradesRes = await axios.get(`${API_URL}/api/trades`, {
           headers: {
             "Content-Type": "application/json",
           },
@@ -34,7 +35,7 @@ export default function Account() {
         setTradeHistory(tradesRes.data);
 
         const summaryRes = await axios.get(
-          "https://tradewise-b8jz.onrender.com/api/trades/summary",
+          `${API_URL}/api/trades/summary`,
           {
             headers: {
             "Content-Type": "application/json",
