@@ -74,7 +74,7 @@ router.post("/logout", (req, res) => {
     sameSite: "None", // prod
     // sameSite: "Lax", // dev
     path: "/",       // must match login
-    maxAge: 2 * 60 * 60 * 1000  
+    maxAge: 0  // Immediately expire the cookie
   });
 
   // console.log("Cleared token cookie");

@@ -11,22 +11,34 @@ export default function Login() {
   const {setUser} = useAuth();
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("called login")
-    const res = await fetch(`${API_URL}/api/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ username, password }),
-    });
+    console.log("called login");
+    
+    if (!API_URL) {
+      alert("API_URL is not configured. Please set VITE_API_URL environment variable.");
+      return;
+    }
 
-    const data = await res.json();
-    if (res.ok) {
-      // localStorage.setItem("token", data.token);
-      console.log(data.token);
-      setUser({username});
-      navigate("/dashboard");
-    } else {
-      alert(data.message || "Login failed");
+    try {
+      console.log("Logging in with API_URL:", API_URL);
+      const res = await fetch(`${API_URL}/api/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        console.log("Login successful:", data);
+        setUser({username});
+        navigate("/dashboard");
+      } else {
+        console.error("Login failed:", data);
+        alert(data.message || "Login failed");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("Network error. Please check your connection and try again.");
     }
   };
 

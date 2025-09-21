@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../Components/Navbar";
 import axios from "axios";
 import { useAuth } from "../context/authContext";
@@ -10,20 +11,41 @@ export default function Account() {
   const [summary, setSummary] = useState([]);
   const [investedMargin, setInvestedMargin] = useState(0);
   const [unrealisedPL, setUnrealisedPL] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user || !user.username) setUserInfo(null);
+    if (isLoading) return; // Wait for auth check to complete
+
+    // Clear all data when user logs out and redirect to login
+    if (!user) {
+      setUserInfo({});
+      setTradeHistory([]);
+      setSummary([]);
+      setInvestedMargin(0);
+      setUnrealisedPL(0);
+      setLoading(false);
+      setError(null);
+      navigate("/login");
+      return;
+    }
 
     const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      
       try {
+        console.log("Fetching profile data...");
         const profileRes = await axios.get(
           `${API_URL}/api/profile`,
           {
-            params: { username: user.username },
+            withCredentials: true,
           }
         );
+        console.log("Profile response:", profileRes.data);
         setUserInfo(profileRes.data);
 
         const tradesRes = await axios.get(`${API_URL}/api/trades`, {
@@ -59,11 +81,33 @@ export default function Account() {
         setUnrealisedPL(totalPL);
       } catch (error) {
         console.error("Error fetching account data:", error);
+        setError(error.response?.data?.message || "Failed to fetch account data");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchData();
-  }, [user]);
+  }, [isLoading, user]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-black">
+        <Navbar />
+        <div className="flex items-center justify-center h-64">
+          <div className="text-red-500 text-xl">Error: {error}</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black">

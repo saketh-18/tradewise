@@ -17,6 +17,7 @@ const app = express();
 app.use(cors({
   origin: [
     "http://localhost:5173",
+    "http://localhost:5174",
     "https://tradewise-pi.vercel.app", 
     "https://tradewise-sakeths-projects-dbd1767a.vercel.app"
   ],

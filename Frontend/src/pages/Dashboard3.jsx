@@ -1,4 +1,5 @@
 import React, {  useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../Components/Navbar";
 import Sidebar from "../Components/SideBar";
 import axios from "axios";
@@ -13,8 +14,16 @@ export default function Dashboard() {
   const startingMargin = 1000000;
   const [recentTrades, setRecentTrades] = useState([]);
   const {user} = useAuth();
+  const navigate = useNavigate();
   useEffect(() => {
-    if(!user) return;
+    // Clear all data when user logs out and redirect to login
+    if (!user) {
+      setSummary([]);
+      setRecentTrades([]);
+      navigate("/login");
+      return;
+    }
+
     const fetchSummary = async () => {
       try {
         const res = await axios.get(
@@ -39,7 +48,7 @@ export default function Dashboard() {
       setRecentTrades(await tradeRes.data);
     };
     fetchData();
-  }, []);
+  }, [user]);
 
   const totalInvested = summary.reduce((sum, item) => sum + item.invested, 0);
   const currentValue = summary.reduce(
