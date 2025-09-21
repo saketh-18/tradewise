@@ -55,7 +55,7 @@ export default function TradePage() {
 
   try {
     // 🔽 Get live price
-    const priceRes = await fetch(`{API_URL}/api/price/`+symbol);
+    const priceRes = await fetch(`${API_URL}/api/price/`+symbol);
     const priceData = await priceRes.json();
     const currentPrice = priceData.price;
     console.log(priceData);
