@@ -6,6 +6,7 @@ import TradePage from './pages/Trade'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Account from './pages/Account'
+import News from './pages/News'
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
       <Route path='/login' element={<Login />} />
       <Route path='/register' element={<Register />} />
       <Route path="/account" element={<Account />} />
+      <Route path='/news' element={<News />} />
     </Routes>
    </Router>
   )

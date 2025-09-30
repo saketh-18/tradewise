@@ -6,6 +6,14 @@
   z-index: -10; /* lower than button's z-10 */
 }
 
+.banner-1-news {
+  background-image: url('/Images/news-bg.jpg');
+     background-size: cover;
+  background-position: center;
+  position: relative;
+  z-index: -10; /* lower than button's z-10 */
+}
+
 /* .landing-root {
   background-color: #0f111a;
 } */

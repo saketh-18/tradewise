@@ -6,7 +6,7 @@ import { useAuth } from "../context/authContext";
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [hasShadow, setHasShadow] = useState(false);
-  const { user , logout } = useAuth();
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,12 +26,9 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`text-white px-4 py-2 z-10 fixed top-0 w-full transition-shadow duration-300 ${
-        hasShadow ? "shadow-lg bg-opacity-90" : ""
+      className={`text-white px-4 py-2 fixed top-0 w-full transition-all duration-300 z-50 ${
+        hasShadow ? "bg-black/30 backdrop-blur-lg shadow-lg" : "bg-transparent"
       }`}
-      style={{
-        backgroundColor: hasShadow ? "rgba(0, 0, 0, 0.8)" : "transparent",
-      }}
     >
       <div className="mx-auto flex items-center justify-between">
         {/* logo */}
@@ -42,7 +39,7 @@ const Navbar = () => {
         </div>
 
         {/* search */}
-        <div className="hidden md:flex items-center space-x-4">
+        <div className=" md:flex items-center space-x-4">
           <input
             type="text"
             placeholder="Search for scrips , indices and cryptocurrencies.."
@@ -51,33 +48,31 @@ const Navbar = () => {
         </div>
 
         {/* desktop menu */}
-        <div className="hidden md:flex space-x-8 text-xl w-1/3 justify-between">
+        <div className="hidden md:flex items-center space-x-8 text-xl w-1/3 justify-between">
           <Link to="/dashboard" className="hover:text-primary">
             Dashboard
           </Link>
           <Link to="/trade" className="hover:text-primary">
             Trade
           </Link>
+          <Link to="/news" className="hover:text-primary">
+            News
+          </Link>
           {/* <Link to="/crypto" className="hover:text-primary">
-            Crypto
-          </Link> */}
+    Crypto
+  </Link> */}
+
           {user === null ? (
-            <>
-              <Link to="/login" className="hover:text-primary">
-                Login
-              </Link>
-              {/* Register Route */}
-              <Link to="/register" className="hover:text-primary">
-                Register
-              </Link>{" "}
-            </>
+            <Link to="/register" className="hover:text-primary">
+              Register
+            </Link>
           ) : (
-            <div className="flex gap-16">
-              <p>Hello {user.username}</p>
-              <button className="hover:text-primary"
-              onClick={logout}
-              >Logout</button>
-            </div>
+            <>
+              <span className="whitespace-nowrap">Hello {user.username}</span>
+              <button onClick={logout} className="hover:text-primary">
+                Logout
+              </button>
+            </>
           )}
         </div>
 

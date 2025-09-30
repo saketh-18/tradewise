@@ -11,6 +11,8 @@ import { authenticateToken } from './middleware/auth.js';
 import portfolioRoutes from './routes/portfolio.js';
 import profileRoute from './routes/profile.js';
 import cookieParser from 'cookie-parser';
+import newsRoute from './routes/news.js';
+import mailRoute from './routes/mail.js';
 
 const app = express();
 
@@ -39,7 +41,8 @@ app.use("/api/trades", tradeRoutes);
 app.use("/api/price", priceRoutes);
 app.use("/api/portfolio", portfolioRoutes);
 app.use("/api/profile" , profileRoute);
-
+app.use("/api/news" , newsRoute);
+app.use('/api/mail', mailRoute);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

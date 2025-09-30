@@ -3,7 +3,7 @@ dotenv.config();
 import express from "express";
 import FormData from "form-data"; // form-data v4.0.1
 import Mailgun from "mailgun.js"; // mailgun.js v11.1.0
-const app = express();
+const router = express.Router();
 
 const mailgun = new Mailgun(FormData);
   const mg = mailgun.client({
@@ -14,7 +14,7 @@ const mailgun = new Mailgun(FormData);
   });
 
 
-app.get("/send" , async (req , res) => {
+router.get("/" , async (req , res) => {
   try {
     const data = await mg.messages.create("sandboxa0db361081674f8f85e3cdd8e65907b4.mailgun.org", {
       from: "Mailgun Sandbox <postmaster@sandboxa0db361081674f8f85e3cdd8e65907b4.mailgun.org>",
@@ -29,4 +29,4 @@ app.get("/send" , async (req , res) => {
   }
 });
 
-app.listen(3000, () => console.log("listening on port 3000"));
+export default router;
