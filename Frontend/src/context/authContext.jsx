@@ -12,13 +12,13 @@ export const AuthProvider = ({ children }) => {
     const checkAuth = async () => {
       try {
         if (!API_URL) {
-          console.error("API_URL is not defined. Please set VITE_API_URL environment variable.");
+          // console.error("API_URL is not defined. Please set VITE_API_URL environment variable.");
           setUser(null);
           setIsLoading(false);
           return;
         }
 
-        console.log("Checking auth with API_URL:", API_URL);
+        // console.log("Checking auth with API_URL:", API_URL);
         const res = await fetch(`${API_URL}/api/profile`, {
           method: "GET",
           credentials: "include",
@@ -26,14 +26,14 @@ export const AuthProvider = ({ children }) => {
         
         if (res.ok) {
           const userData = await res.json();
-          console.log("Auth check successful:", userData);
+          // console.log("Auth check successful:", userData);
           setUser(userData);
         } else {
-          console.log("Auth check failed with status:", res.status);
+          // console.log("Auth check failed with status:", res.status);
           setUser(null);
         }
       } catch (error) {
-        console.error("Auth check failed:", error);
+        // console.error("Auth check failed:", error);
         setUser(null);
       } finally {
         setIsLoading(false);
@@ -46,12 +46,12 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       if (!API_URL) {
-        console.error("API_URL is not defined. Cannot logout.");
+        // console.error("API_URL is not defined. Cannot logout.");
         setUser(null);
         return;
       }
 
-      console.log("Logging out with API_URL:", API_URL);
+      // console.log("Logging out with API_URL:", API_URL);
       const res = await fetch(`${API_URL}/api/logout`, {
         method: "POST",
         credentials: "include",
@@ -59,15 +59,15 @@ export const AuthProvider = ({ children }) => {
       
       const data = await res.json();
       if (res.ok) {
-        console.log("Logout successful:", data.message);
+        // console.log("Logout successful:", data.message);
         setUser(null);
       } else {
-        console.error("Logout failed:", data.message);
+        // console.error("Logout failed:", data.message);
         // Still clear user state even if server logout fails
         setUser(null);
       }
     } catch (error) {
-      console.error("Logout error:", error);
+      // console.error("Logout error:", error);
       // Still clear user state even if network fails
       setUser(null);
     }

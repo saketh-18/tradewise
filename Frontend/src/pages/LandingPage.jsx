@@ -22,7 +22,7 @@ export default function LandingPage() {
     <>
       <Navbar />
       {/* Banner 1*/}
-      <div className="flex h-screen w-full relative bg-fixed bg-[url('Images/banner.jpg')] bg-cover bg-center z-0">
+      <div className="flex h-screen w-full relative bg-fixed banner-bg bg-cover bg-center z-0">
         <div className="w-full  bg-gradient-to-b from-zinc-900 to-transparent flex flex-col justify-center items-center">
           <p className="text-white banner-1-sub animation-1">
             India's no1 paper trading platform.
