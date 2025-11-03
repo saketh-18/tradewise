@@ -21,9 +21,8 @@ export default function Login() {
 
     const data = await res.json();
     if (res.ok) {
-      // localStorage.setItem("token", data.token);
-      console.log(data.token);
-      setUser({username});
+      console.log("Login successful:", data);
+      setUser(data.user); // Use the user data returned from backend
       navigate("/dashboard");
     } else {
       alert(data.message || "Login failed");

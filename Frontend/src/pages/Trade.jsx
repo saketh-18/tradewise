@@ -3,8 +3,10 @@ import Navbar from "../Components/Navbar";
 import Sidebar from "../Components/SideBar";
 import Watchlist from "../Components/Watchlist";
 import { API_URL } from "../config";
+import { useAuth } from "../context/authContext";
 
 export default function TradePage() {
+  const { user, isLoading } = useAuth();
   const [symbol, setSymbol] = useState("AAPL");
   const [inputSymbol, setInputSymbol] = useState("AAPL");
   const [quantity, setQuantity] = useState("");
@@ -42,61 +44,91 @@ export default function TradePage() {
   };
 
   const handleTrade = async (type) => {
-  if (!quantity || parseFloat(quantity) <= 0) {
-    alert("Please enter a valid quantity.");
-    return;
-  }
-
-  const token = localStorage.getItem("token");
-  if (!token) {
-    alert("Login required to perform trades.");
-    return;
-  }
-
-  try {
-    // 🔽 Get live price
-    const priceRes = await fetch(`${API_URL}/api/price/`+symbol);
-    const priceData = await priceRes.json();
-    const currentPrice = priceData.price;
-    console.log(priceData);
-
-    if (!currentPrice || currentPrice === 0) {
-      console.log(symbol);
-      alert("Invalid stock symbol or unable to fetch price.");
+    if (!quantity || parseFloat(quantity) <= 0) {
+      alert("Please enter a valid quantity.");
       return;
     }
 
-    const tradeData = {
-      symbol,
-      quantity: parseFloat(quantity),
-      price: currentPrice,
-      type,
-    };
-    
-    console.log(token);
-    const res = await fetch(`${API_URL}/api/trades`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(tradeData),
-    });
-
-    const result = await res.json();
-
-    if (res.ok) {
-      alert(result.message || "Trade successful!");
-      setQuantity("");
-    } else {
-      alert(result.message || "Trade failed.");
+    if (!user) {
+      alert("Login required to perform trades.");
+      return;
     }
-  } catch (error) {
-    alert("Server error. Please try again.");
-    console.error(error);
-  }
-};
 
+    try {
+      // 🔽 Get live price
+      const priceRes = await fetch(`${API_URL}/api/price/`+symbol);
+      const priceData = await priceRes.json();
+      const currentPrice = priceData.price;
+      console.log(priceData);
+
+      if (!currentPrice || currentPrice === 0) {
+        console.log(symbol);
+        alert("Invalid stock symbol or unable to fetch price.");
+        return;
+      }
+
+      const tradeData = {
+        symbol,
+        quantity: parseFloat(quantity),
+        price: currentPrice,
+        type,
+      };
+      
+      const res = await fetch(`${API_URL}/api/trades`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(tradeData),
+      });
+
+      const result = await res.json();
+
+      if (res.ok) {
+        alert(result.message || "Trade successful!");
+        setQuantity("");
+      } else {
+        alert(result.message || "Trade failed.");
+      }
+    } catch (error) {
+      alert("Server error. Please try again.");
+      console.error(error);
+    }
+  };
+
+
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#0f111a] text-white font-sans flex items-center justify-center">
+        <div className="text-xl">Loading...</div>
+      </div>
+    );
+  }
+
+  // Show login prompt if user is not authenticated
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-[#0f111a] text-white font-sans">
+        <nav className="z-50 h-24">
+          <Navbar />
+        </nav>
+        <div className="flex items-center justify-center min-h-[calc(100vh-6rem)]">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold mb-4">Login Required</h2>
+            <p className="text-gray-400 mb-4">You need to be logged in to access the trading page.</p>
+            <button 
+              onClick={() => window.location.href = '/login'}
+              className="bg-[#00ffb3] text-black px-6 py-2 rounded-md font-semibold"
+            >
+              Go to Login
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0f111a] text-white font-sans">

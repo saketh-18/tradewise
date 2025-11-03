@@ -48,15 +48,21 @@ router.post("/login", async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true, // prod
-      // secure:false, //dev
-      sameSite: "None", // prod
-      // sameSite : "Lax", //dev
+      secure: false, // dev - set to true in production
+      sameSite: "Lax", // dev - set to "None" in production
       path: "/",
       maxAge: 2 * 60 * 60 * 1000
     });
 
-    res.json({ message: "Login successful" });
+    res.json({ 
+      message: "Login successful",
+      user: {
+        id: user._id,
+        username: user.username,
+        name: user.name,
+        email: user.email
+      }
+    });
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ message: "Server error" });
@@ -69,10 +75,8 @@ router.post("/logout", (req, res) => {
 
   res.clearCookie("token", {
     httpOnly: true,
-    secure: true, // prod
-    // secure: false,  // dev
-    sameSite: "None", // prod
-    // sameSite: "Lax", // dev
+    secure: false, // dev - set to true in production
+    sameSite: "Lax", // dev - set to "None" in production
     path: "/",       // must match login
     maxAge: 0  // Immediately expire the cookie
   });

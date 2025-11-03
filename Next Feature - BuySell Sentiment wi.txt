@@ -1,0 +1,4 @@
+Next Feature - Buy/Sell Sentiment with AI
+News Tab
+
+Guardian API : https://content.guardianapis.com/search?api-key=0c41d3be-6eb5-445f-b8b8-2514ca3c7639&order-by=newest&show-fields=thumbnail,trailText&page-size=6
