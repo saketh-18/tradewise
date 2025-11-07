@@ -153,6 +153,63 @@ router.get("/holdings", authenticateToken, async (req, res) => {
 });
 
 
+// Helper function to calculate realized P&L using FIFO method
+function calculateRealizedPL(trades) {
+  let realizedPL = 0;
+  const buyQueue = []; // FIFO queue for buy trades
+
+  // Sort trades by date to process in chronological order
+  const sortedTrades = [...trades].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  for (const trade of sortedTrades) {
+    if (trade.type === "buy") {
+      buyQueue.push({
+        quantity: trade.quantity,
+        price: trade.price,
+        date: trade.date,
+      });
+    } else if (trade.type === "sell") {
+      let remainingSellQty = trade.quantity;
+      const sellPrice = trade.price;
+
+      while (remainingSellQty > 0 && buyQueue.length > 0) {
+        const buyTrade = buyQueue[0];
+        const qtyToMatch = Math.min(remainingSellQty, buyTrade.quantity);
+
+        // Calculate P&L for this matched portion
+        const pl = (sellPrice - buyTrade.price) * qtyToMatch;
+        realizedPL += pl;
+
+        // Update quantities
+        remainingSellQty -= qtyToMatch;
+        buyTrade.quantity -= qtyToMatch;
+
+        // Remove buy trade if fully matched
+        if (buyTrade.quantity === 0) {
+          buyQueue.shift();
+        }
+      }
+    }
+  }
+
+  return realizedPL;
+}
+
+// Get total realized P&L
+router.get("/realized-pl", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const trades = await Trade.find({ userId }).sort({ date: 1 });
+    
+    const realizedPL = calculateRealizedPL(trades);
+
+    res.json({ realizedPL });
+  } catch (err) {
+    console.error("Error calculating realized P&L:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 // Exit a position (sell shares you own)
 router.post("/exit", authenticateToken, async (req, res) => {
   try {
@@ -178,6 +235,9 @@ router.post("/exit", authenticateToken, async (req, res) => {
         .json({ message: "Unable to fetch current market price" });
     }
 
+    // Get all trades for this symbol to calculate realized P&L for this exit
+    const allTrades = await Trade.find({ userId, symbol: symbol.toUpperCase() }).sort({ date: 1 });
+    
     // Record a sell trade to exit
     const trade = new Trade({
       userId,
@@ -189,9 +249,16 @@ router.post("/exit", authenticateToken, async (req, res) => {
 
     await trade.save();
 
+    // Calculate realized P&L for this specific exit using FIFO
+    const tradesWithNewSell = [...allTrades, trade];
+    const realizedPLBefore = calculateRealizedPL(allTrades);
+    const realizedPLAfter = calculateRealizedPL(tradesWithNewSell);
+    const realizedPLForThisExit = realizedPLAfter - realizedPLBefore;
+
     res.status(201).json({
       message: `Exited ${quantity} of ${symbol} at ${marketPrice}`,
       trade,
+      realizedPL: realizedPLForThisExit,
     });
   } catch (err) {
     console.error("Error in /exit:", err);

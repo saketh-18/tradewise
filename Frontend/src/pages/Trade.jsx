@@ -4,7 +4,7 @@ import Watchlist from "../Components/Watchlist";
 import { API_URL } from "../config";
 import { useAuth } from "../context/authContext";
 import SymbolNews from "../Components/SymbolNews";
-import AISignal from "../Components/AiSignal";
+import AISignal from "../Components/AISignal";  
 
 export default function TradePage() {
   const { user, isLoading } = useAuth();
@@ -142,7 +142,7 @@ export default function TradePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0f111a] text-white font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white font-sans">
       <nav className="z-50 h-24">
         <Navbar />
       </nav>

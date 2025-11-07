@@ -11,6 +11,7 @@ export default function Account() {
   const [summary, setSummary] = useState([]);
   const [investedMargin, setInvestedMargin] = useState(0);
   const [unrealisedPL, setUnrealisedPL] = useState(0);
+  const [realizedPL, setRealizedPL] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -27,6 +28,7 @@ export default function Account() {
       setSummary([]);
       setInvestedMargin(0);
       setUnrealisedPL(0);
+      setRealizedPL(0);
       setLoading(false);
       setError(null);
       navigate("/login");
@@ -79,6 +81,19 @@ export default function Account() {
         });
         setInvestedMargin(totalInvested);
         setUnrealisedPL(totalPL);
+        
+        // Fetch realized P&L
+        try {
+          const realizedPLRes = await axios.get(
+            `${API_URL}/api/trades/realized-pl`,
+            {
+              withCredentials: true,
+            }
+          );
+          setRealizedPL(realizedPLRes.data.realizedPL || 0);
+        } catch (err) {
+          console.error("Error fetching realized P&L:", err);
+        }
       } catch (error) {
         console.error("Error fetching account data:", error);
         setError(error.response?.data?.message || "Failed to fetch account data");
@@ -88,6 +103,25 @@ export default function Account() {
     };
 
     fetchData();
+    
+    // Listen for position exit events to refresh realized P&L
+    const handlePositionExited = () => {
+      axios.get(
+        `${API_URL}/api/trades/realized-pl`,
+        {
+          withCredentials: true,
+        }
+      ).then(res => {
+        setRealizedPL(res.data.realizedPL || 0);
+      }).catch(err => {
+        console.error("Error fetching realized P&L:", err);
+      });
+    };
+    window.addEventListener('positionExited', handlePositionExited);
+    
+    return () => {
+      window.removeEventListener('positionExited', handlePositionExited);
+    };
   }, [isLoading, user]);
 
   if (isLoading) {
@@ -110,11 +144,11 @@ export default function Account() {
   }
 
   return (
-    <div className="min-h-screen bg-black overflow-hidden">
+    <div className="bg-gradient-to-r from-gray-900  to-black min-h-[100vh]">
   <Navbar />
 
   {/* Main Grid */}
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-6 py-10 relative top-20">
+  <div className="bg-gradient-to-r from-gray-900 to-black min-h-[100vh] grid grid-cols-1 md:grid-cols-3 gap-6 px-6 py-10 relative top-20">
     
     {/* Left Profile Card */}
     <div className="bg-[#1a1d2b] p-6 rounded-lg shadow-md flex flex-col items-center">
@@ -151,7 +185,7 @@ export default function Account() {
     <div className="md:col-span-2 space-y-6">
       
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-[#1a1d2b] p-6 rounded-lg text-center">
           <p className="text-gray-400 text-sm">Invested Margin</p>
           <p className="text-white text-2xl font-semibold">
@@ -172,6 +206,16 @@ export default function Account() {
             }`}
           >
             ${unrealisedPL.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+          </p>
+        </div>
+        <div className="bg-[#1a1d2b] p-6 rounded-lg text-center">
+          <p className="text-gray-400 text-sm">Realised P&amp;L</p>
+          <p
+            className={`text-2xl font-semibold ${
+              realizedPL >= 0 ? "text-green-400" : "text-red-500"
+            }`}
+          >
+            ${realizedPL.toLocaleString(undefined, { maximumFractionDigits: 2 })}
           </p>
         </div>
       </div>

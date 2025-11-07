@@ -65,7 +65,12 @@ export default function CurrentHoldings() {
       }
       
       const result = await res.json();
-      alert(result.message || "Exited successfully");
+      
+      // Show realized P&L in the alert message
+      const plMessage = result.realizedPL !== undefined 
+        ? `\nRealized P&L: $${result.realizedPL.toFixed(2)}`
+        : '';
+      alert((result.message || "Exited successfully") + plMessage);
       
       // Reload holdings from server to get updated data
       const holdingsRes = await fetch(`${API_URL}/api/trades/holdings`, {
@@ -77,6 +82,10 @@ export default function CurrentHoldings() {
         const updatedHoldings = await holdingsRes.json();
         setHoldings(updatedHoldings || []);
       }
+      
+      // Trigger a page refresh to update the Dashboard's realized P&L
+      // This ensures the Dashboard shows the updated realized P&L
+      window.dispatchEvent(new Event('positionExited'));
     } catch (err) {
       console.error("Exit trade error:", err);
       alert("Failed to exit position");

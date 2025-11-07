@@ -14,6 +14,7 @@ export default function Dashboard() {
   const [summary, setSummary] = useState([]);
   const startingMargin = 1000000;
   const [recentTrades, setRecentTrades] = useState([]);
+  const [realizedPL, setRealizedPL] = useState(0);
   const {user, isLoading} = useAuth();
   const navigate = useNavigate();
   
@@ -28,6 +29,7 @@ export default function Dashboard() {
     if (!user) {
       setSummary([]);
       setRecentTrades([]);
+      setRealizedPL(0);
       navigate("/login");
       return;
     }
@@ -56,6 +58,30 @@ export default function Dashboard() {
       setRecentTrades(await tradeRes.data);
     };
     fetchData();
+    const fetchRealizedPL = async () => {
+      try {
+        const res = await axios.get(
+          `${API_URL}/api/trades/realized-pl`,
+          {
+            withCredentials: true,
+          }
+        );
+        setRealizedPL(res.data.realizedPL || 0);
+      } catch (err) {
+        console.error("Error fetching realized P&L:", err);
+      }
+    };
+    fetchRealizedPL();
+    
+    // Listen for position exit events to refresh realized P&L
+    const handlePositionExited = () => {
+      fetchRealizedPL();
+    };
+    window.addEventListener('positionExited', handlePositionExited);
+    
+    return () => {
+      window.removeEventListener('positionExited', handlePositionExited);
+    };
   }, [user, isLoading, navigate]);
 
   const totalInvested = summary.reduce((sum, item) => sum + item.invested, 0);
@@ -88,7 +114,7 @@ export default function Dashboard() {
 
   return (
     <>
-    <div className="bg-[#0f111a] min-h-screen text-white w-full">
+    <div className="bg-gradient-to-br from-gray-900 to-black text-white w-full">
       <Navbar />
       {/* <div className="flex relative top-24 min-h-screen"> */}
         {/* <Sidebar /> */}
@@ -97,7 +123,7 @@ export default function Dashboard() {
           <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
 
           {/* Overview Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 ">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 ">
             <div className="border border-[#24283b] rounded-xl bg-[#111422]/80 p-4 shadow-md">
               <p className="text-gray-400">Invested Margin</p>
               <p className="text-2xl font-semibold text-white">
@@ -111,13 +137,23 @@ export default function Dashboard() {
               </p>
             </div>
             <div className="border border-[#24283b] rounded-xl bg-[#111422]/80 p-4 shadow-md">
-              <p className="text-gray-400">Total P&L</p>
+              <p className="text-gray-400">Unrealized P&L</p>
               <p
                 className={`text-2xl font-semibold ${
                   totalPL >= 0 ? "text-green-400" : "text-red-400"
                 }`}
               >
                 ${totalPL.toFixed(2)}
+              </p>
+            </div>
+            <div className="border border-[#24283b] rounded-xl bg-[#111422]/80 p-4 shadow-md">
+              <p className="text-gray-400">Realized P&L</p>
+              <p
+                className={`text-2xl font-semibold ${
+                  realizedPL >= 0 ? "text-green-400" : "text-red-400"
+                }`}
+              >
+                ${realizedPL.toFixed(2)}
               </p>
             </div>
           </div>
