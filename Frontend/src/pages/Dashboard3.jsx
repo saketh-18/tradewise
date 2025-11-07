@@ -8,15 +8,23 @@ import RecentTrades from "../Components/RecentTrades";
 import { useAuth } from "../context/authContext";
 import { Import } from "lucide-react";
 import { API_URL } from "../config";
+import CurrentHoldings from "../Components/CurrentHoldings";
 
 export default function Dashboard() {
   const [summary, setSummary] = useState([]);
   const startingMargin = 1000000;
   const [recentTrades, setRecentTrades] = useState([]);
-  const {user} = useAuth();
+  const {user, isLoading} = useAuth();
   const navigate = useNavigate();
+  
   useEffect(() => {
-    // Clear all data when user logs out and redirect to login
+    // Wait for auth check to complete before redirecting
+    // TODO: In production, ensure cookie settings match between frontend/backend domains
+    if (isLoading) {
+      return; // Still checking authentication, don't redirect yet
+    }
+    
+    // Only redirect if auth check is complete AND user is not logged in
     if (!user) {
       setSummary([]);
       setRecentTrades([]);
@@ -48,7 +56,7 @@ export default function Dashboard() {
       setRecentTrades(await tradeRes.data);
     };
     fetchData();
-  }, [user]);
+  }, [user, isLoading, navigate]);
 
   const totalInvested = summary.reduce((sum, item) => sum + item.invested, 0);
   const currentValue = summary.reduce(
@@ -59,6 +67,24 @@ export default function Dashboard() {
   const availableMargin = startingMargin - totalInvested;
 
   const topPerformers = [...summary].sort((a, b) => b.pl - a.pl).slice(0, 3);
+
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div className="bg-[#0f111a] min-h-screen text-white w-full flex items-center justify-center">
+        <div className="text-xl">Loading...</div>
+      </div>
+    );
+  }
+
+  // If not loading and no user, the useEffect will redirect, but show a message just in case
+  if (!user) {
+    return (
+      <div className="bg-[#0f111a] min-h-screen text-white w-full flex items-center justify-center">
+        <div className="text-xl">Redirecting to login...</div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -72,19 +98,19 @@ export default function Dashboard() {
 
           {/* Overview Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 ">
-            <div className="bg-[#1a1d2b] p-4 rounded-lg shadow-md">
+            <div className="border border-[#24283b] rounded-xl bg-[#111422]/80 p-4 shadow-md">
               <p className="text-gray-400">Invested Margin</p>
               <p className="text-2xl font-semibold text-white">
                 ${totalInvested.toFixed(2)}
               </p>
             </div>
-            <div className="bg-[#1a1d2b] p-4 rounded-lg shadow-md">
+            <div className="border border-[#24283b] rounded-xl bg-[#111422]/80 p-4 shadow-md">
               <p className="text-gray-400">Available Margin</p>
               <p className="text-2xl font-semibold text-white">
                 ${availableMargin.toFixed(2)}
               </p>
             </div>
-            <div className="bg-[#1a1d2b] p-4 rounded-lg shadow-md">
+            <div className="border border-[#24283b] rounded-xl bg-[#111422]/80 p-4 shadow-md">
               <p className="text-gray-400">Total P&L</p>
               <p
                 className={`text-2xl font-semibold ${
@@ -103,7 +129,7 @@ export default function Dashboard() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {topPerformers.map((item, index) => (
-                <div key={index} className="bg-[#1a1d2b] p-4 rounded-lg">
+                <div key={index} className="border border-[#24283b] rounded-xl bg-[#111422]/80 p-4">
                   <p className="text-lg font-semibold">{item.symbol}</p>
                   <p className="text-sm text-gray-400">
                     Quantity: {item.quantity}
@@ -125,11 +151,13 @@ export default function Dashboard() {
               ))}
             </div>
           </div>
-
+            
+          {/* {Current Holdings } */}
+          <CurrentHoldings />
           {/* Asset Table */}
           <div>
             <h2 className="text-xl font-semibold mb-3">Portfolio Summary</h2>
-            <div className="bg-[#1a1d2b] p-4 rounded-lg overflow-x-auto">
+            <div className="border border-[#24283b] rounded-xl bg-[#111422]/80 p-4 overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="text-[#7f8fa6] text-left">
                   <tr>

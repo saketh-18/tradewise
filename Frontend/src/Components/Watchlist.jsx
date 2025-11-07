@@ -1,4 +1,8 @@
-export default function Watchlist({ watchlist }) {
+export default function Watchlist({ watchlist, setWatchlist }) {
+  function handleRemove(item){
+    const newWatchlist = watchlist.filter(it => it != item);
+    setWatchlist(newWatchlist);
+  }
   return (
     <div className="bg-[#1a1d2b] p-4 rounded-lg">
       <h3 className="text-lg font-semibold mb-4">Watchlist</h3>
@@ -9,7 +13,7 @@ export default function Watchlist({ watchlist }) {
             className="bg-[#2b2f40] px-4 py-2 rounded-md flex justify-between"
           >
             <span>{item}</span>
-            <button className="text-[#00ffb3] hover:underline text-sm">Trade</button>
+            <button onClick={() => handleRemove(item)} className="text-[#00ffb3] hover:underline text-sm">remove</button>
           </li>
         ))}
       </ul>

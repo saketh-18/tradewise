@@ -6,7 +6,7 @@ const router = express.Router();
 // GET user profile by username
 router.get("/", authenticateToken, async (req, res) => {
   try {
-    console.log("Profile route accessed, user from token:", req.user);
+    // console.log("Profile route accessed, user from token:", req.user);
     const userId = req.user.id; // comes from JWT payload in middleware
 
     if (!userId) {
@@ -20,7 +20,7 @@ router.get("/", authenticateToken, async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    console.log("Profile data found:", user);
+    // console.log("Profile data found:", user);
     res.json(user);
   } catch (err) {
     console.error("Profile fetch error:", err);

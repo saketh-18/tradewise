@@ -111,6 +111,95 @@ router.get("/debug/all", async (req, res) => {
   }
 });
 
+// Get user's current holdings (open positions)
+router.get("/holdings", authenticateToken, async (req, res) => {
+  // console.log("Cookies received:", req.cookies);
+  // console.log("Decoded user:", req.user);
+
+  try {
+    // Convert userId string to ObjectId for proper MongoDB matching
+    // The userId from JWT is a string, but the database stores it as ObjectId
+    const userId = new mongoose.Types.ObjectId(req.user.id);
+
+    const holdings = await Trade.aggregate([
+      { $match: { userId } },
+
+      {
+        $group: {
+          _id: "$symbol",
+          totalBought: {
+            $sum: { $cond: [{ $eq: ["$type", "buy"] }, "$quantity", 0] },
+          },
+          totalSold: {
+            $sum: { $cond: [{ $eq: ["$type", "sell"] }, "$quantity", 0] },
+          },
+        },
+      },
+      {
+        $project: {
+          symbol: "$_id",
+          netQuantity: { $subtract: ["$totalBought", "$totalSold"] },
+          _id: 0,
+        },
+      },
+      { $match: { netQuantity: { $ne: 0 } } }, // only active holdings
+    ]);
+
+    res.json(holdings);
+  } catch (err) {
+    console.error("Error in /holdings:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+// Exit a position (sell shares you own)
+router.post("/exit", authenticateToken, async (req, res) => {
+  try {
+    const { symbol, quantity } = req.body;
+    const userId = req.user.id;
+
+    if (!symbol || !quantity) {
+      return res.status(400).json({ message: "Symbol and quantity required" });
+    }
+
+    // Fetch live market price from Finnhub
+    const priceRes = await axios.get("https://finnhub.io/api/v1/quote", {
+      params: {
+        symbol,
+        token: process.env.FINNHUB_API_KEY,
+      },
+    });
+
+    const marketPrice = priceRes.data.c;
+    if (!marketPrice) {
+      return res
+        .status(400)
+        .json({ message: "Unable to fetch current market price" });
+    }
+
+    // Record a sell trade to exit
+    const trade = new Trade({
+      userId,
+      symbol: symbol.toUpperCase(),
+      quantity,
+      price: marketPrice,
+      type: "sell",
+    });
+
+    await trade.save();
+
+    res.status(201).json({
+      message: `Exited ${quantity} of ${symbol} at ${marketPrice}`,
+      trade,
+    });
+  } catch (err) {
+    console.error("Error in /exit:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
 // router.get("/debug/all", async (req, res) => {
 //   const allTrades = await Trade.find(); // no filter
 //   res.json(allTrades);

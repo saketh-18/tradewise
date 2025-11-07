@@ -110,7 +110,7 @@ export default function Account() {
   }
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-black overflow-hidden">
   <Navbar />
 
   {/* Main Grid */}

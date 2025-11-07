@@ -36,7 +36,7 @@ router.post("/register", async (req, res) => {
 // Login
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
-  console.log(req.body);
+  // console.log(req.body);
   try {
     const user = await User.findOne({ username });
     if (!user) return res.status(400).json({ message: "Invalid credentials" });
@@ -44,14 +44,16 @@ router.post("/login", async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "2h" });
+    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "7h" });
 
+    // TODO: In production, change secure to true and sameSite to "none"
+    // Also ensure your frontend domain is in the CORS origin list
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, // dev - set to true in production
-      sameSite: "Lax", // dev - set to "None" in production
+      secure: false, // Change to true in production (requires HTTPS)
+      sameSite: "lax", // Change to "none" in production if frontend/backend are on different domains
       path: "/",
-      maxAge: 2 * 60 * 60 * 1000
+      maxAge: 7 * 60 * 60 * 1000 // 7 hours
     });
 
     res.json({ 
@@ -75,8 +77,8 @@ router.post("/logout", (req, res) => {
 
   res.clearCookie("token", {
     httpOnly: true,
-    secure: false, // dev - set to true in production
-    sameSite: "Lax", // dev - set to "None" in production
+    secure: false, // Change to true in production (requires HTTPS)
+    sameSite: "lax", // Change to "none" in production if frontend/backend are on different domains
     path: "/",       // must match login
     maxAge: 0  // Immediately expire the cookie
   });

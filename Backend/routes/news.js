@@ -1,6 +1,7 @@
 import express from "express";
 import axios from "axios";
 const router = express.Router();
+const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY;
 
 router.get("/", async (req, res) => {
     try {
@@ -15,4 +16,23 @@ router.get("/", async (req, res) => {
     }
 })
 
+router.get("/:symbol", async (req, res) => { 
+    try {
+        const { symbol } =  req.params;
+        console.log(symbol)
+        const response = await axios.get(`https://finnhub.io/api/v1/company-news?symbol=${symbol}&from=2025-01-15&to=2025-06-20&token=${FINNHUB_API_KEY}`);
+        const result = response.data;  
+        // console.log(result);
+        const data = result.slice(0,20);
+    
+        res.json(data);
+    } catch(err){
+        console.log("Error fetching symbol news", err);
+        res.status(500).json({message : "Error fetching News"});
+    }
+})
+
 export default router;
+
+
+// https://finnhub.io/api/v1/company-news?symbol=AAPL&from=2025-05-15&to=2025-06-20&token=d1cjenhr01qvlf60d2ogd1cjenhr01qvlf60d2p0
