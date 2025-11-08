@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../Components/Navbar";
 import Watchlist from "../Components/Watchlist";
 import { API_URL } from "../config";
@@ -11,30 +12,50 @@ import { Search } from "lucide-react"; // for icon (install via: npm i lucide-re
 
 export default function TradePage() {
   const { user, isLoading } = useAuth();
+  const navigate = useNavigate();
 
   const [symbol, setSymbol] = useState("BSE:TCS");
   const [name, setName] = useState("Tata Consultancy Services"); // 👈 company name
   const [quantity, setQuantity] = useState("");
   const [watchlist, setWatchlist] = useState(["BSE:TCS"]);
 
+  // Handle authentication and navigation
+  useEffect(() => {
+    if (isLoading) {
+      return; // Still checking authentication
+    }
+
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, isLoading]);
+
   // 🧭 Chart load on symbol change
   useEffect(() => {
     const loadWidget = () => {
-      if (window.TradingView) {
-        const existing = document.getElementById("tradingview-widget");
-        if (existing) existing.innerHTML = "";
-
-        new window.TradingView.widget({
-          autosize: true,
-          symbol,
-          interval: "D",
-          timezone: "Asia/Kolkata",
-          theme: "dark",
-          style: "1",
-          locale: "en",
-          toolbar_bg: "#0f111a",
-          container_id: "tradingview-widget",
-        });
+      try {
+        if (window.TradingView) {
+          const existing = document.getElementById("tradingview-widget");
+          if (existing) {
+            existing.innerHTML = "";
+            
+            new window.TradingView.widget({
+              autosize: true,
+              symbol,
+              interval: "D",
+              timezone: "Asia/Kolkata",
+              theme: "dark",
+              style: "1",
+              locale: "en",
+              toolbar_bg: "#0f111a",
+              container_id: "tradingview-widget",
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error loading TradingView widget:", error);
       }
     };
     const timer = setTimeout(loadWidget, 300);
@@ -123,7 +144,7 @@ export default function TradePage() {
               You need to be logged in to access the trading page.
             </p>
             <button
-              onClick={() => (window.location.href = "/login")}
+              onClick={() => navigate("/login")}
               className="bg-[#00ffb3] text-black px-6 py-2 rounded-md font-semibold"
             >
               Go to Login

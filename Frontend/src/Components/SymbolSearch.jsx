@@ -1,9 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import symbols from "../../Data/bseSymbols.json";
 
 export default function SymbolSearch({ onSelect }) {
   const [query, setQuery] = useState("");
   const [filtered, setFiltered] = useState([]);
+  const searchRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setFiltered([]);
+      }
+    };
+
+    if (filtered.length > 0) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [filtered.length]);
 
   const handleChange = (e) => {
     const value = e.target.value;
@@ -21,7 +39,7 @@ export default function SymbolSearch({ onSelect }) {
   };
 
   return (
-    <div className="relative w-full mx-auto mt-2">
+    <div className="relative w-full mx-auto mt-2" ref={searchRef}>
       <input
         type="text"
         value={query}
@@ -35,8 +53,10 @@ export default function SymbolSearch({ onSelect }) {
           {filtered.map((stock) => (
             <li
               key={stock.symbol}
-              onClick={() => {
-                onSelect(stock.symbol);
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onSelect(stock.symbol, stock.name);
                 setQuery(stock.name);
                 setFiltered([]);
               }}

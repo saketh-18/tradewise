@@ -34,6 +34,8 @@ export default function Account() {
       return;
     }
 
+    let isMounted = true;
+
     const fetchData = async () => {
       setLoading(true);
       setError(null);
@@ -46,8 +48,10 @@ export default function Account() {
             withCredentials: true,
           }
         );
-        console.log("Profile response:", profileRes.data);
-        setUserInfo(profileRes.data);
+        if (isMounted) {
+          console.log("Profile response:", profileRes.data);
+          setUserInfo(profileRes.data || {});
+        }
 
         const tradesRes = await axios.get(`${API_URL}/api/trades`, {
           headers: {
@@ -55,7 +59,9 @@ export default function Account() {
           },
           withCredentials: true,
         });
-        setTradeHistory(tradesRes.data);
+        if (isMounted) {
+          setTradeHistory(Array.isArray(tradesRes.data) ? tradesRes.data : []);
+        }
 
         const summaryRes = await axios.get(
           `${API_URL}/api/trades/summary`,
@@ -66,20 +72,26 @@ export default function Account() {
             withCredentials: true,
           }
         );
-        setSummary(summaryRes.data);
+        const summaryData = Array.isArray(summaryRes.data) ? summaryRes.data : [];
+        if (isMounted) {
+          setSummary(summaryData);
+        }
 
-        // Compute totals
+        // Compute totals with safety checks
         let totalInvested = 0;
         let totalPL = 0;
-        console.log(summaryRes.data);
-        summaryRes.data.forEach((item) => {
-          if (item.quantity > 0) {
-            totalInvested += item.invested;
-            totalPL += item.pl;
-          }
-        });
-        setInvestedMargin(totalInvested);
-        setUnrealisedPL(totalPL);
+        if (Array.isArray(summaryData)) {
+          summaryData.forEach((item) => {
+            if (item && item.quantity > 0) {
+              totalInvested += item.invested || 0;
+              totalPL += item.pl || 0;
+            }
+          });
+        }
+        if (isMounted) {
+          setInvestedMargin(totalInvested);
+          setUnrealisedPL(totalPL);
+        }
         
         // Fetch realized P&L
         try {
@@ -89,15 +101,24 @@ export default function Account() {
               withCredentials: true,
             }
           );
-          setRealizedPL(realizedPLRes.data.realizedPL || 0);
+          if (isMounted) {
+            setRealizedPL(realizedPLRes.data?.realizedPL || 0);
+          }
         } catch (err) {
           console.error("Error fetching realized P&L:", err);
+          if (isMounted) {
+            setRealizedPL(0);
+          }
         }
       } catch (error) {
         console.error("Error fetching account data:", error);
-        setError(error.response?.data?.message || "Failed to fetch account data");
+        if (isMounted) {
+          setError(error.response?.data?.message || "Failed to fetch account data");
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
@@ -105,22 +126,28 @@ export default function Account() {
     
     // Listen for position exit events to refresh realized P&L
     const handlePositionExited = () => {
-      axios.get(
-        `${API_URL}/api/trades/realized-pl`,
-        {
-          withCredentials: true,
-        }
-      ).then(res => {
-        setRealizedPL(res.data.realizedPL || 0);
-      }).catch(err => {
-        console.error("Error fetching realized P&L:", err);
-      });
+      if (isMounted) {
+        axios.get(
+          `${API_URL}/api/trades/realized-pl`,
+          {
+            withCredentials: true,
+          }
+        ).then(res => {
+          if (isMounted) {
+            setRealizedPL(res.data?.realizedPL || 0);
+          }
+        }).catch(err => {
+          console.error("Error fetching realized P&L:", err);
+        });
+      }
     };
     window.addEventListener('positionExited', handlePositionExited);
     
     return () => {
+      isMounted = false;
       window.removeEventListener('positionExited', handlePositionExited);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading, user]);
 
   if (isLoading) {
@@ -180,7 +207,7 @@ export default function Account() {
         <div className="bg-[#1a1d2b] p-6 rounded-lg text-center">
           <p className="text-gray-400 text-sm">Available Margin</p>
           <p className="text-white text-2xl font-semibold">
-            ₹{(1000000 - investedMargin).toLocaleString()}
+            ₹{(1000000 - investedMargin + realizedPL).toLocaleString()}
           </p>
         </div>
         <div className="bg-[#1a1d2b] p-6 rounded-lg text-center">
@@ -229,17 +256,17 @@ export default function Account() {
               ) : (
                 tradeHistory.map((trade, idx) => (
                   <tr key={idx} className="border-t border-[#2b2f40]">
-                    <td>{new Date(trade.date).toLocaleString()}</td>
-                    <td>{trade.symbol}</td>
+                    <td>{trade.date ? new Date(trade.date).toLocaleString() : 'N/A'}</td>
+                    <td>{trade.symbol || 'N/A'}</td>
                     <td
                       className={
                         trade.type === "buy" ? "text-green-400" : "text-red-500"
                       }
                     >
-                      {trade.type.toUpperCase()}
+                      {trade.type ? trade.type.toUpperCase() : 'N/A'}
                     </td>
-                    <td>{trade.quantity}</td>
-                    <td>${trade.price.toFixed(2)}</td>
+                    <td>{trade.quantity || 0}</td>
+                    <td>₹{trade.price ? trade.price.toFixed(2) : '0.00'}</td>
                   </tr>
                 ))
               )}
