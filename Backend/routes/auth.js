@@ -50,8 +50,8 @@ router.post("/login", async (req, res) => {
     // Also ensure your frontend domain is in the CORS origin list
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, // Change to true in production (requires HTTPS)
-      sameSite: "lax", // Change to "none" in production if frontend/backend are on different domains
+      secure: true, // Change to true in production (requires HTTPS)
+      sameSite: "none", // Change to "none" in production if frontend/backend are on different domains
       path: "/",
       maxAge: 7 * 60 * 60 * 1000 // 7 hours
     });
@@ -77,8 +77,8 @@ router.post("/logout", (req, res) => {
 
   res.clearCookie("token", {
     httpOnly: true,
-    secure: false, // Change to true in production (requires HTTPS)
-    sameSite: "lax", // Change to "none" in production if frontend/backend are on different domains
+    secure: true, // Change to true in production (requires HTTPS)
+    sameSite: "none", // Change to "none" in production if frontend/backend are on different domains
     path: "/",       // must match login
     maxAge: 0  // Immediately expire the cookie
   });
