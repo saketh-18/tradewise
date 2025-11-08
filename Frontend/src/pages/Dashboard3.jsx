@@ -1,4 +1,4 @@
-import React, {  useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../Components/Navbar";
 import Sidebar from "../Components/SideBar";
@@ -15,16 +15,16 @@ export default function Dashboard() {
   const startingMargin = 1000000;
   const [recentTrades, setRecentTrades] = useState([]);
   const [realizedPL, setRealizedPL] = useState(0);
-  const {user, isLoading} = useAuth();
+  const { user, isLoading } = useAuth();
   const navigate = useNavigate();
-  
+
   useEffect(() => {
     // Wait for auth check to complete before redirecting
     // TODO: In production, ensure cookie settings match between frontend/backend domains
     if (isLoading) {
       return; // Still checking authentication, don't redirect yet
     }
-    
+
     // Only redirect if auth check is complete AND user is not logged in
     if (!user) {
       setSummary([]);
@@ -36,12 +36,9 @@ export default function Dashboard() {
 
     const fetchSummary = async () => {
       try {
-        const res = await axios.get(
-          `${API_URL}/api/trades/summary`,
-          {
-            withCredentials: true,
-          }
-        );
+        const res = await axios.get(`${API_URL}/api/trades/summary`, {
+          withCredentials: true,
+        });
         setSummary(res.data);
       } catch (err) {
         console.error("Error fetching trade summary:", err);
@@ -49,38 +46,32 @@ export default function Dashboard() {
     };
     fetchSummary();
     const fetchData = async () => {
-      const tradeRes = await axios.get(
-        `${API_URL}/api/trades`,
-        {
-          withCredentials: true,
-        }
-      );
+      const tradeRes = await axios.get(`${API_URL}/api/trades`, {
+        withCredentials: true,
+      });
       setRecentTrades(await tradeRes.data);
     };
     fetchData();
     const fetchRealizedPL = async () => {
       try {
-        const res = await axios.get(
-          `${API_URL}/api/trades/realized-pl`,
-          {
-            withCredentials: true,
-          }
-        );
+        const res = await axios.get(`${API_URL}/api/trades/realized-pl`, {
+          withCredentials: true,
+        });
         setRealizedPL(res.data.realizedPL || 0);
       } catch (err) {
         console.error("Error fetching realized P&L:", err);
       }
     };
     fetchRealizedPL();
-    
+
     // Listen for position exit events to refresh realized P&L
     const handlePositionExited = () => {
       fetchRealizedPL();
     };
-    window.addEventListener('positionExited', handlePositionExited);
-    
+    window.addEventListener("positionExited", handlePositionExited);
+
     return () => {
-      window.removeEventListener('positionExited', handlePositionExited);
+      window.removeEventListener("positionExited", handlePositionExited);
     };
   }, [user, isLoading, navigate]);
 
@@ -114,9 +105,9 @@ export default function Dashboard() {
 
   return (
     <>
-    <div className="bg-gradient-to-br from-gray-900 to-black text-white w-full">
-      <Navbar />
-      {/* <div className="flex relative top-24 min-h-screen"> */}
+      <div className="bg-gradient-to-br from-gray-900 to-black text-white w-full">
+        <Navbar />
+        {/* <div className="flex relative top-24 min-h-screen"> */}
         {/* <Sidebar /> */}
 
         <div className="flex flex-col w-full p-4 relative top-24 bg-inherit">
@@ -127,13 +118,13 @@ export default function Dashboard() {
             <div className="border border-[#24283b] rounded-xl bg-[#111422]/80 p-4 shadow-md">
               <p className="text-gray-400">Invested Margin</p>
               <p className="text-2xl font-semibold text-white">
-                ${totalInvested.toFixed(2)}
+                ₹{totalInvested.toFixed(2)}
               </p>
             </div>
             <div className="border border-[#24283b] rounded-xl bg-[#111422]/80 p-4 shadow-md">
               <p className="text-gray-400">Available Margin</p>
               <p className="text-2xl font-semibold text-white">
-                ${availableMargin.toFixed(2)}
+                ₹{availableMargin.toFixed(2)}
               </p>
             </div>
             <div className="border border-[#24283b] rounded-xl bg-[#111422]/80 p-4 shadow-md">
@@ -143,7 +134,7 @@ export default function Dashboard() {
                   totalPL >= 0 ? "text-green-400" : "text-red-400"
                 }`}
               >
-                ${totalPL.toFixed(2)}
+                ₹{totalPL.toFixed(2)}
               </p>
             </div>
             <div className="border border-[#24283b] rounded-xl bg-[#111422]/80 p-4 shadow-md">
@@ -153,7 +144,7 @@ export default function Dashboard() {
                   realizedPL >= 0 ? "text-green-400" : "text-red-400"
                 }`}
               >
-                ${realizedPL.toFixed(2)}
+                ₹{realizedPL.toFixed(2)}
               </p>
             </div>
           </div>
@@ -165,83 +156,146 @@ export default function Dashboard() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {topPerformers.map((item, index) => (
-                <div key={index} className="border border-[#24283b] rounded-xl bg-[#111422]/80 p-4">
+                <div
+                  key={index}
+                  className="border border-[#24283b] rounded-xl bg-[#111422]/80 p-4"
+                >
                   <p className="text-lg font-semibold">{item.symbol}</p>
                   <p className="text-sm text-gray-400">
                     Quantity: {item.quantity}
                   </p>
                   <p className="text-sm">
-                    Avg Buy Price: ${item.avgBuyPrice.toFixed(2)}
+                    Avg Buy Price: ₹{item.avgBuyPrice.toFixed(2)}
                   </p>
                   <p className="text-sm">
-                    Current Price: ${item.currentPrice.toFixed(2)}
+                    Current Price: ₹{item.currentPrice.toFixed(2)}
                   </p>
                   <p
                     className={`text-sm ${
                       item.pl >= 0 ? "text-green-400" : "text-red-400"
                     }`}
                   >
-                    P&L: ${item.pl.toFixed(2)}
+                    P&L: ₹{item.pl.toFixed(2)}
                   </p>
                 </div>
               ))}
             </div>
           </div>
-            
+
           {/* {Current Holdings } */}
           <CurrentHoldings />
           {/* Asset Table */}
           <div>
             <h2 className="text-xl font-semibold mb-3">Portfolio Summary</h2>
-            <div className="border border-[#24283b] rounded-xl bg-[#111422]/80 p-4 overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="text-[#7f8fa6] text-left">
-                  <tr>
-                    <th>Symbol</th>
-                    <th>Quantity</th>
-                    <th>Avg Buy Price</th>
-                    <th>Current Price</th>
-                    <th>Invested</th>
-                    <th>Current Value</th>
-                    <th>P&L</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {summary.map((item, index) => (
-                    <tr key={index} className="border-t border-[#2b2f40]">
-                      <td>{item.symbol}</td>
-                      <td>{item.quantity}</td>
-                      <td>${item.avgBuyPrice.toFixed(2)}</td>
-                      <td>${item.currentPrice.toFixed(2)}</td>
-                      <td>${item.invested.toFixed(2)}</td>
-                      <td>${item.currentValue.toFixed(2)}</td>
-                      <td
-                        className={
-                          item.pl >= 0 ? "text-green-400" : "text-red-400"
-                        }
-                      >
-                        ${item.pl.toFixed(2)}
-                      </td>
+
+            <div className="border border-[#24283b] rounded-xl bg-[#111422]/80 p-4">
+              {/* Scrollable table on small screens */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm min-w-[600px] md:min-w-full">
+                  <thead className="text-[#7f8fa6] text-left">
+                    <tr>
+                      <th className="py-2 px-3">Symbol</th>
+                      <th className="py-2 px-3">Quantity</th>
+                      <th className="py-2 px-3">Avg Buy Price</th>
+                      <th className="py-2 px-3">Current Price</th>
+                      <th className="py-2 px-3">Invested</th>
+                      <th className="py-2 px-3">Current Value</th>
+                      <th className="py-2 px-3">P&amp;L</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {summary.map((item, index) => (
+                      <tr
+                        key={index}
+                        className="border-t border-[#2b2f40] hover:bg-[#1a1d2e]/70 transition"
+                      >
+                        <td className="py-2 px-3">{item.symbol}</td>
+                        <td className="py-2 px-3">{item.quantity}</td>
+                        <td className="py-2 px-3">
+                          ₹{item.avgBuyPrice.toFixed(2)}
+                        </td>
+                        <td className="py-2 px-3">
+                          ₹{item.currentPrice.toFixed(2)}
+                        </td>
+                        <td className="py-2 px-3">
+                          ₹{item.invested.toFixed(2)}
+                        </td>
+                        <td className="py-2 px-3">
+                          ₹{item.currentValue.toFixed(2)}
+                        </td>
+                        <td
+                          className={`py-2 px-3 ${
+                            item.pl >= 0 ? "text-green-400" : "text-red-400"
+                          }`}
+                        >
+                          ₹{item.pl.toFixed(2)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Stacked (card-like) view for mobile */}
+              <div className="md:hidden mt-4 space-y-3">
+                {summary.map((item, index) => (
+                  <div
+                    key={index}
+                    className="border border-[#2b2f40] rounded-lg p-3 bg-[#0c0e17]/70"
+                  >
+                    <div className="flex justify-between">
+                      <span className="text-[#7f8fa6]">Symbol:</span>
+                      <span>{item.symbol}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[#7f8fa6]">Quantity:</span>
+                      <span>{item.quantity}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[#7f8fa6]">Avg Buy:</span>
+                      <span>₹{item.avgBuyPrice.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[#7f8fa6]">Current:</span>
+                      <span>₹{item.currentPrice.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[#7f8fa6]">Invested:</span>
+                      <span>₹{item.invested.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[#7f8fa6]">Value:</span>
+                      <span>₹{item.currentValue.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[#7f8fa6]">P&amp;L:</span>
+                      <span
+                        className={`${
+                          item.pl >= 0 ? "text-green-400" : "text-red-400"
+                        }`}
+                      >
+                        ₹{item.pl.toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-            <div className="mb-8 mt-4">
-              <h2 className="text-xl font-semibold mb-3">Insights</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-[#1f2235] p-4 rounded-lg overflow-auto">
-                  <AssetPieChart data={summary} />
-                </div>
-                <div className="bg-[#1f2235] p-4 rounded-lg overflow-auto">
-                 <RecentTrades trades={recentTrades} />
-                </div>
+          </div>
+
+          <div className="mb-8 mt-4">
+            <h2 className="text-xl font-semibold mb-3">Insights</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-[#1f2235] p-4 rounded-lg overflow-auto">
+                <AssetPieChart data={summary} />
+              </div>
+              <div className="bg-[#1f2235] p-4 rounded-lg overflow-auto">
+                <RecentTrades trades={recentTrades} />
               </div>
             </div>
-          
+          </div>
         </div>
-    </div>
+      </div>
     </>
   );
 }

@@ -3,7 +3,7 @@
 }
 
 .banner-1-news {
-  background-image: url('/Images/news-bg.jpg');
+  background-image: url('/Frontend/public/Images/news-bg.jpg');
      background-size: cover;
   background-position: center;
   position: relative;

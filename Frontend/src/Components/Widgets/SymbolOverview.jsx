@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, memo } from "react";
 
-function SymbolOverview() {
+function SymbolOverview({symbol}) {
   const container = useRef();
-
+  if(!symbol) symbol = "SUZLON"; 
   useEffect(() => {
     // Clear previous content to prevent duplicates
     container.current.innerHTML = "";
@@ -16,7 +16,7 @@ function SymbolOverview() {
       {
         "symbols": [
           [
-            "BSE:SUZLON|1D"
+            "BSE:${symbol}|1D"
           ]
         ],
         "chartOnly": false,

@@ -14,8 +14,7 @@ export default function Account() {
   const [realizedPL, setRealizedPL] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, logout } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -151,7 +150,7 @@ export default function Account() {
   <div className="bg-gradient-to-r from-gray-900 to-black min-h-[100vh] grid grid-cols-1 md:grid-cols-3 gap-6 px-6 py-10 relative top-20">
     
     {/* Left Profile Card */}
-    <div className="bg-[#1a1d2b] p-6 rounded-lg shadow-md flex flex-col items-center">
+    <div className="bg-[#1a1d2b] p-6 rounded-lg shadow-md flex flex-col items-center h-[40vh]">
       <div className="w-20 h-20 rounded-full bg-[#2b2f40] flex items-center justify-center text-3xl text-white">
         👤
       </div>
@@ -162,23 +161,9 @@ export default function Account() {
       <p className="mt-2 text-sm flex items-center gap-2">
         <span className="text-green-400">● Verified</span>
       </p>
-      <p className="text-gray-400 text-sm">Member Since Jan 2023</p>
-
-      <button className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-white text-sm font-medium">
-        Edit Profile
-      </button>
 
       {/* Account Settings */}
-      <div className="mt-6 w-full">
-        <h3 className="text-gray-300 font-semibold mb-3">Account Settings</h3>
-        <ul className="space-y-2 text-gray-400 text-sm">
-          <li className="hover:text-blue-400 cursor-pointer">🔒 Security & Login</li>
-          <li className="hover:text-blue-400 cursor-pointer">🔔 Notifications</li>
-          <li className="hover:text-blue-400 cursor-pointer">💳 Payment Methods</li>
-          <li className="hover:text-blue-400 cursor-pointer">🌐 Language</li>
-          <li className="text-red-500 hover:text-red-400 cursor-pointer">🗑 Delete Account</li>
-        </ul>
-      </div>
+      <button className="text-white p-2 rounded-md bg-rose-700 my-2 w-24" onClick={logout}>Logout</button>
     </div>
 
     {/* Middle + Right Stats */}
@@ -189,13 +174,13 @@ export default function Account() {
         <div className="bg-[#1a1d2b] p-6 rounded-lg text-center">
           <p className="text-gray-400 text-sm">Invested Margin</p>
           <p className="text-white text-2xl font-semibold">
-            ${investedMargin.toLocaleString()}
+            ₹{investedMargin.toLocaleString()}
           </p>
         </div>
         <div className="bg-[#1a1d2b] p-6 rounded-lg text-center">
           <p className="text-gray-400 text-sm">Available Margin</p>
           <p className="text-white text-2xl font-semibold">
-            ${(1000000 - investedMargin).toLocaleString()}
+            ₹{(1000000 - investedMargin).toLocaleString()}
           </p>
         </div>
         <div className="bg-[#1a1d2b] p-6 rounded-lg text-center">
@@ -205,7 +190,7 @@ export default function Account() {
               unrealisedPL >= 0 ? "text-green-400" : "text-red-500"
             }`}
           >
-            ${unrealisedPL.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+            ₹{unrealisedPL.toLocaleString(undefined, { maximumFractionDigits: 2 })}
           </p>
         </div>
         <div className="bg-[#1a1d2b] p-6 rounded-lg text-center">
@@ -215,7 +200,7 @@ export default function Account() {
               realizedPL >= 0 ? "text-green-400" : "text-red-500"
             }`}
           >
-            ${realizedPL.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+            ₹{realizedPL.toLocaleString(undefined, { maximumFractionDigits: 2 })}
           </p>
         </div>
       </div>

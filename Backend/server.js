@@ -14,6 +14,8 @@ import cookieParser from 'cookie-parser';
 import newsRoute from './routes/news.js';
 import mailRoute from './routes/mail.js';
 import aiRoute from './routes/ai.js';``
+import IndianPrice from './routes/IndianPrice.js';
+import symbolRoutes from "./routes/symbolRoutes.js";
 
 const app = express();
 
@@ -45,6 +47,9 @@ app.use("/api/profile" , profileRoute);
 app.use("/api/news" , newsRoute);
 app.use('/api/mail', mailRoute);
 app.use('/api/ai', aiRoute);
+app.use('/api/indian-price', IndianPrice);
+app.use("/api/symbol", symbolRoutes);
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

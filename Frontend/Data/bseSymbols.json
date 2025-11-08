@@ -1,0 +1,8 @@
+[
+  { "symbol": "BSE:TCS", "name": "Tata Consultancy Services" },
+  { "symbol": "BSE:INFY", "name": "Infosys Ltd" },
+  { "symbol": "BSE:RELIANCE", "name": "Reliance Industries" },
+  { "symbol": "BSE:TATAMOTORS", "name": "Tata Motors Ltd" },
+  { "symbol": "BSE:HDFCBANK", "name": "HDFC Bank Ltd" },
+  { "symbol": "BSE:ICICIBANK", "name": "ICICI Bank Ltd" }
+]

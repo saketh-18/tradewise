@@ -13,7 +13,7 @@ export default function TradingViewWidget({ symbol = "AAPL" }) {
       height: 400,
       theme: "dark",
       interval: "D",
-      timezone: "Etc/UTC",
+      timezone: "Asia/Kolkata",
       style: "1",
       locale: "en",
     });

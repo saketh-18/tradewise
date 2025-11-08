@@ -1,134 +1,138 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/authContext";
+import { motion } from "framer-motion";
+import { Moon, Sun, Bell } from "lucide-react";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [hasShadow, setHasShadow] = useState(false);
-  const { user, logout } = useAuth();
+  const [isDark, setIsDark] = useState(true);
+  const [time, setTime] = useState("");
+  const [marketOpen, setMarketOpen] = useState(false);
+  const { user } = useAuth();
 
+  // Detect scroll
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 0) {
-        setHasShadow(true);
-      } else {
-        setHasShadow(false);
-      }
-    };
-
+    const handleScroll = () => setHasShadow(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+  // Live clock
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date();
+      setTime(now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
+
+      // Check market open/close (IST 9:15 AM - 3:30 PM)
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+      const isOpen =
+        (hours > 9 || (hours === 9 && minutes >= 15)) &&
+        (hours < 15 || (hours === 15 && minutes <= 30));
+      setMarketOpen(isOpen);
+    }, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
-    <nav
-      className={`text-white px-4 py-2 fixed top-0 w-full transition-all duration-300 z-50 ${
-        hasShadow ? "bg-black/30 backdrop-blur-lg shadow-lg" : "bg-transparent"
+    <motion.nav
+      initial={{ y: -40, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.4 }}
+      className={`text-white px-6 py-3 fixed top-0 w-full z-50 transition-all duration-300 ${
+        hasShadow
+          ? "bg-gradient-to-r from-zinc-900/80 via-black/70 to-zinc-800/60 backdrop-blur-xl shadow-lg"
+          : "bg-transparent"
       }`}
     >
-      <div className="mx-auto flex items-center justify-between">
-        {/* logo */}
-        <div className="text-2xl font-bold">
-          <Link to="/">
-            <img src="/Images/logo-1.png" width={"220px"} />
-          </Link>
-        </div>
+      <div className="flex items-center justify-between max-w-7xl mx-auto">
+        {/* Logo */}
+        <Link to="/" className="flex items-center space-x-2">
+          <img src="/Images/logo-1.png" alt="logo" className="w-52" />
+        </Link>
 
-        {/* search */}
-        
-<form class="w-96">
-  <label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">
-    Search
-  </label>
-  <div class="relative">
-    {/* <!-- Search Icon --> */}
-    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-      <svg class="w-5 h-5 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-        viewBox="0 0 20 20">
-        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-      </svg>
-    </div>
-
-    {/* <!-- Input --> */}
-    <input type="search" id="default-search"
-      class="block w-full p-3 pl-10 text-sm text-white rounded-2xl bg-[#1a1d2b] border border-gray-700 
-             placeholder-gray-500 focus:ring-2 focus:ring-gray-900 focus:border-gray-900 shadow-lg"
-      placeholder="Search Indices..." required />
-
-    {/* <!-- Button --> */}
-    
-  </div>
-</form>
-
-
-
-        {/* desktop menu */}
-        <div className="hidden md:flex items-center space-x-8 text-xl w-1/3 justify-between">
-          <Link to="/dashboard" className="hover:text-primary">
-            Dashboard
-          </Link>
-          <Link to="/trade" className="hover:text-primary">
-            Trade
-          </Link>
-          <Link to="/news" className="hover:text-primary">
-            News
-          </Link>
-          {/* <Link to="/crypto" className="hover:text-primary">
-    Crypto
-  </Link> */}
-
-          {user === null ? (
-            <Link to="/register" className="hover:text-primary">
-              Register
-            </Link>
-          ) : (
-            <>
-              <span className="whitespace-nowrap">Hello {user.username}</span>
-              <button onClick={logout} className="hover:text-primary">
-                Logout
-              </button>
-            </>
-          )}
-        </div>
-
-        {/* User profile */}
-        <div className="hidden md:block">
-          <Link
-            to="/account"
-            className="px-4 py-2 rounded-md hover:text-primary"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="size-8"
+        {/* Desktop Links */}
+        <div className="hidden md:flex items-center space-x-10 text-lg">
+          {["dashboard", "trade", "news"].map((path) => (
+            <Link
+              key={path}
+              to={`/${path}`}
+              className="relative group font-medium"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-              />
-            </svg>
+              <span className="text-2xl group-hover:text-emerald-400 group-hover:drop-shadow-[0_0_6px_rgba(52,211,153,0.6)] transition-all duration-200">
+                {path.charAt(0).toUpperCase() + path.slice(1)}
+              </span>
+              <span className=" -bottom-1 w-0 h-[2px] bg-primary transition-all group-hover:w-full"></span>
+            </Link>
+          ))}
+        </div>
+
+        {/* Right Section */}
+        <div className="hidden md:flex items-center space-x-5">
+          {/* Live Time */}
+          <span className="text-sm text-gray-400 tracking-wide font-mono">
+            {time}
+          </span>
+
+          {/* Market Status */}
+          <div
+            className={`flex items-center space-x-2 px-3 py-1 rounded-full border transition-all duration-500 cursor-default ${
+              marketOpen
+                ? "border-green-500/30 bg-green-500/10"
+                : "border-red-500/30 bg-red-500/10"
+            }`}
+            title="Market hours: 9:15 AM – 3:30 PM IST"
+          >
+            <div
+              className={`w-2.5 h-2.5 rounded-full ${
+                marketOpen ? "bg-green-400 animate-pulse" : "bg-red-400"
+              }`}
+            ></div>
+            <span
+              className={`text-sm font-medium ${
+                marketOpen ? "text-green-400" : "text-red-400"
+              }`}
+            >
+              {marketOpen ? "Market Open" : "Market Closed"}
+            </span>
+          </div>
+
+          {/* User Profile */}
+          <Link to="/account" className="flex items-center gap-2 hover:opacity-90">
+            <div className="bg-white/10 rounded-full p-1">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.5"
+                  d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 11-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0Z"
+                />
+              </svg>
+            </div>
+            <span className="text-sm font-medium text-gray-300">
+              {user?.name ? `Hi, ${user.name}` : "Login"}
+            </span>
           </Link>
         </div>
 
-        {/* menu toggle */}
+        {/* Mobile Menu Button */}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="md:hidden focus:outline-none"
         >
           <svg
-            className="w-6 h-6"
+            className="w-7 h-7"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
           >
             <path
               strokeLinecap="round"
@@ -144,33 +148,33 @@ const Navbar = () => {
         </button>
       </div>
 
-      {/* mobile meu */}
+      {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-gradient-to-r from-zinc-900 to-transparent w-full m-0 rounded-lg z-50">
-          <Link to="/dashboard" className="block px-3 py-2 hover:bg-gray-700">
-            Dashboard
-          </Link>
-          <Link to="/trade" className="block px-3 py-2 hover:bg-gray-700">
-            Trade
-          </Link>
-          {/* <Link to="/crypto" className="block px-3 py-2 hover:bg-gray-700">
-            Crypto
-          </Link> */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="md:hidden mt-2 bg-zinc-900/80 backdrop-blur-lg rounded-lg overflow-hidden"
+        >
+          {["dashboard", "trade", "news"].map((path) => (
+            <Link
+              key={path}
+              to={`/${path}`}
+              className="block px-4 py-3 hover:bg-zinc-800 transition"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              {path.charAt(0).toUpperCase() + path.slice(1)}
+            </Link>
+          ))}
           <Link
             to="/account"
-            className="block w-full text-left px-3 py-2 text-white rounded-md"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="block px-4 py-3 hover:bg-zinc-800 transition"
           >
-            Profile
+            Account
           </Link>
-          <Link
-            to="/login"
-            className="block w-full text-left px-3 py-2 text-white rounded-md"
-          >
-            Login
-          </Link>
-        </div>
+        </motion.div>
       )}
-    </nav>
+    </motion.nav>
   );
 };
 

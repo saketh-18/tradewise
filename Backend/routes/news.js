@@ -5,10 +5,12 @@ const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY;
 
 router.get("/", async (req, res) => {
     try {
-        const response = await axios.get('https://content.guardianapis.com/search?api-key=0c41d3be-6eb5-445f-b8b8-2514ca3c7639&q=stockmarket&section=business&page-size=12')
-        const result = response.data.response.results;
+        const response = await axios.get(`https://finnhub.io/api/v1/news?category=general&token=${FINNHUB_API_KEY}`)
+        const result = response.data;
         if(!result) return res.status(404).json({message : "Error fetching news"});
-        res.json(result);
+        const newsData = result.slice(0,40);
+        const not_market = newsData.filter((el) => el.source != "MarketWatch");
+        res.json(not_market);
     }
     catch (err) { 
     console.error("News Fetch Error:", err);

@@ -10,6 +10,7 @@ const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY;
 const FINNHUB_URL = "https://finnhub.io/api/v1/quote";
 // console.log(FINNHUB_API_KEY); 
 // Get current price for a symbol
+
 router.get("/:symbol", async (req, res) => {
   const symbol = req.params.symbol.toUpperCase();
   try {

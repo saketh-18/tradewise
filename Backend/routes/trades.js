@@ -3,6 +3,7 @@ import Trade from '../models/Trade.js';
 import authenticateToken from '../middleware/auth.js';
 import axios from "axios";
 import mongoose from "mongoose";
+import { getIndianStockPrice } from '../utils/priceHelper.js';
 
 const router = express.Router();
 
@@ -46,42 +47,79 @@ router.get("/", authenticateToken, async (req, res) => {
 router.get("/summary", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
-    const trades = await Trade.find({ userId });
+    // Sort trades by date to process chronologically
+    const trades = await Trade.find({ userId }).sort({ date: 1 });
+    
     const summary = {};
     for (let trade of trades) {
-      if (!summary[trade.symbol]) {
-        summary[trade.symbol] = { quantity: 0, total: 0 };
+      const symbol = trade.symbol.toUpperCase();
+      if (!summary[symbol]) {
+        summary[symbol] = { quantity: 0, total: 0 };
       }
 
-      const multiplier = trade.type === "buy" ? 1 : -1;
-      summary[trade.symbol].quantity += trade.quantity * multiplier;
-      summary[trade.symbol].total += trade.price * trade.quantity * multiplier;
+      if (trade.type === "buy") {
+        // Buy: add to quantity and total invested
+        summary[symbol].quantity += trade.quantity;
+        summary[symbol].total += trade.quantity * trade.price;
+      } else {
+        // Sell: reduce quantity and invested proportionally based on average buy price
+        if (summary[symbol].quantity > 0) {
+          const avgBuyPrice = summary[symbol].total / summary[symbol].quantity;
+          const qtyToSell = Math.min(trade.quantity, summary[symbol].quantity);
+          summary[symbol].quantity -= qtyToSell;
+          summary[symbol].total -= avgBuyPrice * qtyToSell;
+          // Ensure values don't go negative due to floating point errors
+          if (summary[symbol].total < 0) {
+            summary[symbol].total = 0;
+          }
+          if (summary[symbol].quantity < 0) {
+            summary[symbol].quantity = 0;
+          }
+        }
+        // If trying to sell more than owned, ignore the excess (or handle short selling separately)
+      }
     }
 
     const results = [];
     for (let symbol in summary) {
       const position = summary[symbol];
-      if (position.quantity === 0) continue; // skip sold-out positions
+      // Skip positions with zero or negative quantity
+      if (position.quantity <= 0) continue;
 
-      const priceRes = await axios.get("https://finnhub.io/api/v1/quote", {
-        params: {
-          symbol,
-          token: process.env.FINNHUB_API_KEY,
-        },
-      });
+      // Skip positions with negative or zero total (safety check)
+      if (position.total <= 0) {
+        console.warn(`Warning: Invalid total for ${symbol}, skipping`);
+        continue;
+      }
 
-      const currentPrice = priceRes.data.c;
-      const invested = position.total;
+      // Get current price using Indian price API
+      let currentPrice;
+      try {
+        currentPrice = await getIndianStockPrice(symbol);
+      } catch (error) {
+        console.error(`Error fetching price for ${symbol}:`, error.message);
+        // Skip this symbol if we can't get the price
+        continue;
+      }
+
+      const avgBuyPrice = position.total / position.quantity;
+
+      // Safety check: avgBuyPrice should always be positive
+      if (avgBuyPrice <= 0 || !isFinite(avgBuyPrice)) {
+        console.warn(`Warning: Invalid avgBuyPrice for ${symbol}, skipping`);
+        continue;
+      }
+
       const currentValue = currentPrice * position.quantity;
 
       results.push({
         symbol,
         quantity: position.quantity,
-        avgBuyPrice: invested / position.quantity,
+        avgBuyPrice,
         currentPrice,
-        invested,
+        invested: position.total,
         currentValue,
-        pl: currentValue - invested,
+        pl: currentValue - position.total,
       });
     }
 
@@ -220,16 +258,17 @@ router.post("/exit", authenticateToken, async (req, res) => {
       return res.status(400).json({ message: "Symbol and quantity required" });
     }
 
-    // Fetch live market price from Finnhub
-    const priceRes = await axios.get("https://finnhub.io/api/v1/quote", {
-      params: {
-        symbol,
-        token: process.env.FINNHUB_API_KEY,
-      },
-    });
+    // Fetch live market price using Indian price API
+    let marketPrice;
+    try {
+      marketPrice = await getIndianStockPrice(symbol);
+    } catch (error) {
+      return res
+        .status(400)
+        .json({ message: `Unable to fetch current market price: ${error.message}` });
+    }
 
-    const marketPrice = priceRes.data.c;
-    if (!marketPrice) {
+    if (!marketPrice || marketPrice === 0) {
       return res
         .status(400)
         .json({ message: "Unable to fetch current market price" });

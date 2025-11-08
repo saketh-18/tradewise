@@ -110,7 +110,7 @@ export default function CurrentHoldings() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-[#0f172a] border border-[#1e293b] rounded-2xl p-5 shadow-lg text-gray-100 my-4`"
+      className="bg-[#0f172a] border border-[#1e293b] rounded-2xl p-5 shadow-lg text-gray-100 my-4"
     >
       <h2 className="text-lg font-semibold mb-4">Current Holdings</h2>
       <div className="space-y-3">
