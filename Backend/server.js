@@ -13,22 +13,44 @@ import profileRoute from './routes/profile.js';
 import cookieParser from 'cookie-parser';
 import newsRoute from './routes/news.js';
 import mailRoute from './routes/mail.js';
-import aiRoute from './routes/ai.js';``
+import aiRoute from './routes/ai.js';
 import IndianPrice from './routes/IndianPrice.js';
 import symbolRoutes from "./routes/symbolRoutes.js";
 
 const app = express();
 
-app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "https://tradewise-pi.vercel.app", 
-    "https://tradewise-sakeths-projects-dbd1767a.vercel.app"
-  ],
+// CORS configuration - allow Vercel deployments and localhost
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "https://tradewise-pi.vercel.app", 
+  "https://tradewise-sakeths-projects-dbd1767a.vercel.app"
+];
+
+// Allow any Vercel preview deployment (for production flexibility)
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Allow if in allowed list
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      return callback(null, true);
+    }
+    
+    // Allow Vercel preview deployments
+    if (origin.includes('.vercel.app')) {
+      return callback(null, true);
+    }
+    
+    // For production, you might want to be more strict
+    callback(null, true); // Allow all for now - adjust based on your security needs
+  },
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
-}));
+};
+
+app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

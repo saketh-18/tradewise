@@ -9,38 +9,100 @@ export const AuthProvider = ({ children }) => {
 
   // Check if user is authenticated on app load
   useEffect(() => {
+    let isMounted = true;
+    let timeoutId = null;
+    let fetchTimeoutId = null;
+    let controller = null;
+
     const checkAuth = async () => {
       try {
         if (!API_URL) {
-          // console.error("API_URL is not defined. Please set VITE_API_URL environment variable.");
-          setUser(null);
-          setIsLoading(false);
+          if (isMounted) {
+            setUser(null);
+            setIsLoading(false);
+          }
           return;
         }
 
-        // console.log("Checking auth with API_URL:", API_URL);
-        const res = await fetch(`${API_URL}/api/profile`, {
-          method: "GET",
-          credentials: "include",
-        });
-        
-        if (res.ok) {
-          const userData = await res.json();
-          // console.log("Auth check successful:", userData);
-          setUser(userData);
-        } else {
-          // console.log("Auth check failed with status:", res.status);
-          setUser(null);
+        // Create abort controller for fetch timeout
+        controller = new AbortController();
+        fetchTimeoutId = setTimeout(() => {
+          if (controller) {
+            controller.abort();
+          }
+        }, 3000); // 3 second fetch timeout
+
+        // Set a safety timeout to always set loading to false
+        timeoutId = setTimeout(() => {
+          if (isMounted) {
+            setIsLoading(false);
+          }
+        }, 4000); // 4 second absolute timeout
+
+        try {
+          const res = await fetch(`${API_URL}/api/profile`, {
+            method: "GET",
+            credentials: "include",
+            signal: controller.signal,
+          });
+          
+          // Clear timeouts on successful response
+          if (fetchTimeoutId) clearTimeout(fetchTimeoutId);
+          if (timeoutId) clearTimeout(timeoutId);
+          
+          if (isMounted) {
+            if (res.ok) {
+              try {
+                const userData = await res.json();
+                setUser(userData);
+              } catch (jsonError) {
+                console.error("Error parsing user data:", jsonError);
+                setUser(null);
+              }
+            } else {
+              setUser(null);
+            }
+            setIsLoading(false);
+          }
+        } catch (fetchError) {
+          // Clear fetch timeout
+          if (fetchTimeoutId) clearTimeout(fetchTimeoutId);
+          
+          // Ignore abort errors (expected for timeout)
+          if (fetchError.name !== 'AbortError' && isMounted) {
+            console.error("Auth check failed:", fetchError);
+          }
+          
+          if (isMounted) {
+            setUser(null);
+            setIsLoading(false);
+          }
         }
       } catch (error) {
-        // console.error("Auth check failed:", error);
-        setUser(null);
-      } finally {
-        setIsLoading(false);
+        // Clear timeout if still exists
+        if (timeoutId) clearTimeout(timeoutId);
+        if (fetchTimeoutId) clearTimeout(fetchTimeoutId);
+        
+        if (isMounted) {
+          console.error("Auth check error:", error);
+          setUser(null);
+          setIsLoading(false);
+        }
       }
     };
 
+    // Start auth check
     checkAuth();
+
+    // Cleanup function
+    return () => {
+      isMounted = false;
+      if (timeoutId) clearTimeout(timeoutId);
+      if (fetchTimeoutId) clearTimeout(fetchTimeoutId);
+      if (controller) {
+        controller.abort();
+      }
+    };
   }, []);
 
   const logout = async () => {

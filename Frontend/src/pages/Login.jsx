@@ -9,6 +9,8 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const {setUser} = useAuth();
+  
+  // Login page should render immediately, don't wait for auth check
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("called login")
