@@ -19,23 +19,6 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Live clock
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const now = new Date();
-      setTime(now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
-
-      // Check market open/close (IST 9:15 AM - 3:30 PM)
-      const hours = now.getHours();
-      const minutes = now.getMinutes();
-      const isOpen =
-        (hours > 9 || (hours === 9 && minutes >= 15)) &&
-        (hours < 15 || (hours === 15 && minutes <= 30));
-      setMarketOpen(isOpen);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <motion.nav
       initial={{ y: -40, opacity: 0 }}
@@ -71,10 +54,6 @@ const Navbar = () => {
 
         {/* Right Section */}
         <div className="hidden md:flex items-center space-x-5">
-          {/* Live Time */}
-          <span className="text-sm text-gray-400 tracking-wide font-mono">
-            {time}
-          </span>
 
           {/* Market Status */}
           <div

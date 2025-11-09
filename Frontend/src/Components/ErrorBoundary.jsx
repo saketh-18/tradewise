@@ -59,7 +59,7 @@ class ErrorBoundary extends React.Component {
     this.reloadTimer = setTimeout(() => {
       console.log("Auto-reloading page due to error...");
       window.location.reload();
-    }, 5000);
+    }, 100);
   };
 
   componentWillUnmount() {
